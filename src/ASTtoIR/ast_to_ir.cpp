@@ -1,5 +1,7 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 
 #include "../../lib/tree/tree_func.h"
 #include "../../lib/tree/tree_log.h"
@@ -7,22 +9,65 @@
 #include "../../lib/tree/math_tree/dsl_commands.h"
 #include "../../lib/tree/math_tree/math_tree_func.h"
 
-#include "backend.h"
+#include "ast_to_ir.h"
 
+BackendFuncStatus IntReprCtor (IntRepr *interm_repr) {
 
-BackendFuncStatus TreeToAsmFile (FILE *asm_file, const Tree *lang_tree) {
+    assert (interm_repr);
 
-    assert (asm_file);
-    assert (lang_tree);
+    interm_repr -> size = 0;
 
-    AsmFileBeginAndEnd (asm_file);
-
-    AsmFileNewFuncWrite (asm_file, lang_tree -> root);
+    IntReprDataCtor (interm_repr);
 
     return BACKEND_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus AsmFileBeginAndEnd (FILE *asm_file) {
+BackendFuncStatus IntReprDataCtor (IntRepr *interm_repr) {
+
+    interm_repr -> cell = (IntReprCell *) calloc (1, sizeof (IntReprCell));
+    assert (interm_repr -> cell);
+
+    return BACKEND_FUNC_STATUS_OK;
+}
+
+BackendFuncStatus IntReprDataDtor (IntRepr *interm_repr) {
+
+    assert (interm_repr);
+
+    size_t all_cells_size = sizeof (IntReprCell) * (interm_repr -> size);
+
+    memset (interm_repr -> cell, 0, all_cells_size);
+
+    free (interm_repr -> cell);
+    interm_repr -> cell = NULL;
+
+    return BACKEND_FUNC_STATUS_OK;
+}
+
+BackendFuncStatus IntReprDtor (IntRepr *interm_repr) {
+
+    assert (interm_repr);
+
+    IntReprDataDtor (interm_repr);
+
+    interm_repr -> size = 0;
+
+    return BACKEND_FUNC_STATUS_OK;
+}
+
+BackendFuncStatus TreeToIntRepr (FILE *asm_file, const Tree *lang_tree) {
+
+    assert (asm_file);
+    assert (lang_tree);
+
+    IntReprBeginAndEnd (asm_file);
+
+    IntReprNewFuncWrite (asm_file, lang_tree -> root);
+
+    return BACKEND_FUNC_STATUS_OK;
+}
+
+BackendFuncStatus IntReprBeginAndEnd (FILE *asm_file) {
 
     assert (asm_file);
 
@@ -36,7 +81,7 @@ BackendFuncStatus AsmFileBeginAndEnd (FILE *asm_file) {
     return BACKEND_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus AsmFileFuncNameWrite (FILE *asm_file, const TreeNode *current_node) {
+BackendFuncStatus IntReprFuncNameWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
@@ -56,7 +101,7 @@ BackendFuncStatus AsmFileFuncNameWrite (FILE *asm_file, const TreeNode *current_
     return BACKEND_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus AsmFileInitFuncArgsWrite (FILE *asm_file, const TreeNode *current_node) {
+BackendFuncStatus IntReprInitFuncArgsWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
@@ -91,7 +136,7 @@ BackendFuncStatus AsmFileInitFuncArgsWrite (FILE *asm_file, const TreeNode *curr
         switch (NODE_LANG_OPERATOR) {
 
             case COMMA:
-                return AsmFileInitFuncArgsWrite (asm_file, current_node -> left_branch);
+                return IntReprInitFuncArgsWrite (asm_file, current_node -> left_branch);
                 break;
 
             case INIT:
@@ -105,7 +150,7 @@ BackendFuncStatus AsmFileInitFuncArgsWrite (FILE *asm_file, const TreeNode *curr
     return BACKEND_FUNC_STATUS_FAIL;
 }
 
-BackendFuncStatus AsmFileNewFuncWrite (FILE *asm_file, const TreeNode *current_node) {
+BackendFuncStatus IntReprNewFuncWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
@@ -129,9 +174,9 @@ BackendFuncStatus AsmFileNewFuncWrite (FILE *asm_file, const TreeNode *current_n
                 return BACKEND_FUNC_STATUS_FAIL;
         }
 
-        AsmFileFuncNameWrite     (asm_file, CURRENT_FUNC_NAME_NODE (func_node));
-        AsmFileInitFuncArgsWrite (asm_file, CURRENT_FUNC_NAME_NODE (func_node) -> left_branch);
-        AsmFileLangOperatorWrite (asm_file, CURRENT_FUNC_FIRST_END_LINE_NODE (func_node));
+        IntReprFuncNameWrite     (asm_file, CURRENT_FUNC_NAME_NODE (func_node));
+        IntReprInitFuncArgsWrite (asm_file, CURRENT_FUNC_NAME_NODE (func_node) -> left_branch);
+        IntReprLangOperatorWrite (asm_file, CURRENT_FUNC_FIRST_END_LINE_NODE (func_node));
 
 
         fprintf (asm_file, "ret\n\n");      // because of Arman (declane)!!!!!
@@ -139,7 +184,7 @@ BackendFuncStatus AsmFileNewFuncWrite (FILE *asm_file, const TreeNode *current_n
         switch (NODE_LANG_OPERATOR) {
 
             case NEW_FUNC:
-                AsmFileNewFuncWrite (asm_file, current_node -> left_branch);
+                IntReprNewFuncWrite (asm_file, current_node -> left_branch);
                 break;
 
             case INIT:
@@ -153,7 +198,7 @@ BackendFuncStatus AsmFileNewFuncWrite (FILE *asm_file, const TreeNode *current_n
     return BACKEND_FUNC_STATUS_FAIL;
 }
 
-BackendFuncStatus AsmFileLangOperatorWrite (FILE *asm_file, const TreeNode *current_node) {
+BackendFuncStatus IntReprLangOperatorWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
@@ -173,45 +218,45 @@ BackendFuncStatus AsmFileLangOperatorWrite (FILE *asm_file, const TreeNode *curr
         switch (NODE_LANG_OPERATOR) {
 
             case IF:
-                AsmFileOperatorIfWrite (asm_file, current_node);
+                IntReprOperatorIfWrite (asm_file, current_node);
                 break;
 
             case WHILE:
-                AsmFileOperatorWhileWrite (asm_file, current_node);
+                IntReprOperatorWhileWrite (asm_file, current_node);
                 break;
 
             case INIT:
                 current_node = current_node -> right_branch;
             //fallthrough
             case ASSIGN:
-                AsmFileOperatorAssignWrite (asm_file, current_node);
+                IntReprOperatorAssignWrite (asm_file, current_node);
                 break;
 
             case FUNC_RET:
-                AsmFileOperatorRetWrite (asm_file, current_node);
+                IntReprOperatorRetWrite (asm_file, current_node);
                 break;
 
             case FUNC_CALL:
-                AsmFileFuncCallWrite (asm_file, current_node -> left_branch);
+                IntReprFuncCallWrite (asm_file, current_node -> left_branch);
                 fprintf (asm_file, "pop rax\n");
                 break;
 
             case PRINT:
-                AsmFileOperatorPrintWrite (asm_file, current_node);
+                IntReprOperatorPrintWrite (asm_file, current_node);
                 break;
 
             case READ:
-                AsmFileOperatorReadWrite (asm_file, current_node);
+                IntReprOperatorReadWrite (asm_file, current_node);
                 break;
 
             default:
                 return BACKEND_FUNC_STATUS_FAIL;
         }
 
-    return AsmFileLangOperatorWrite (asm_file, end_line_node -> right_branch);
+    return IntReprLangOperatorWrite (asm_file, end_line_node -> right_branch);
 }
 
-BackendFuncStatus AsmFileOperatorReadWrite (FILE *asm_file, const TreeNode *current_node) {
+BackendFuncStatus IntReprOperatorReadWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
@@ -227,7 +272,7 @@ BackendFuncStatus AsmFileOperatorReadWrite (FILE *asm_file, const TreeNode *curr
     return BACKEND_FUNC_STATUS_FAIL;
 }
 
-BackendFuncStatus AsmFileOperatorPrintWrite (FILE *asm_file, const TreeNode *current_node) {
+BackendFuncStatus IntReprOperatorPrintWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
@@ -235,7 +280,7 @@ BackendFuncStatus AsmFileOperatorPrintWrite (FILE *asm_file, const TreeNode *cur
 
     if (NODE_TYPE == LANGUAGE_OPERATOR && NODE_LANG_OPERATOR == PRINT) {
 
-        AsmFileMathExpressionWrite (asm_file, current_node -> left_branch);
+        IntReprMathExpressionWrite (asm_file, current_node -> left_branch);
 
         fprintf (asm_file, "out\n");
 
@@ -245,7 +290,7 @@ BackendFuncStatus AsmFileOperatorPrintWrite (FILE *asm_file, const TreeNode *cur
     return BACKEND_FUNC_STATUS_FAIL;
 }
 
-BackendFuncStatus AsmFileOperatorRetWrite (FILE *asm_file, const TreeNode *current_node) {
+BackendFuncStatus IntReprOperatorRetWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
@@ -253,7 +298,7 @@ BackendFuncStatus AsmFileOperatorRetWrite (FILE *asm_file, const TreeNode *curre
 
     if (NODE_TYPE == LANGUAGE_OPERATOR && NODE_LANG_OPERATOR == FUNC_RET) {
 
-        AsmFileMathExpressionWrite (asm_file, current_node -> left_branch);
+        IntReprMathExpressionWrite (asm_file, current_node -> left_branch);
 
         fprintf (asm_file, "pop rax\n"
                            "push rbx\n"
@@ -268,7 +313,7 @@ BackendFuncStatus AsmFileOperatorRetWrite (FILE *asm_file, const TreeNode *curre
 
 }
 
-BackendFuncStatus AsmFileOperatorIfWrite (FILE *asm_file, const TreeNode *current_node) {
+BackendFuncStatus IntReprOperatorIfWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
@@ -279,21 +324,21 @@ BackendFuncStatus AsmFileOperatorIfWrite (FILE *asm_file, const TreeNode *curren
 
     operator_if_number++;
 
-    AsmFileOperatorOrAndWrite (asm_file, current_node -> left_branch);
+    IntReprOperatorOrAndWrite (asm_file, current_node -> left_branch);
 
     fprintf (asm_file, "push 0\n"
                        "je end_if_%zu\n", curr_if_number);
 
     current_node = current_node -> right_branch;
 
-    AsmFileLangOperatorWrite (asm_file, current_node);
+    IntReprLangOperatorWrite (asm_file, current_node);
 
     fprintf (asm_file, ":end_if_%zu\n", curr_if_number);
 
     return BACKEND_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus AsmFileOperatorWhileWrite (FILE *asm_file, const TreeNode *current_node) {
+BackendFuncStatus IntReprOperatorWhileWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
@@ -306,12 +351,12 @@ BackendFuncStatus AsmFileOperatorWhileWrite (FILE *asm_file, const TreeNode *cur
 
     fprintf (asm_file, ":while_%zu\n", curr_while_number);
 
-    AsmFileOperatorOrAndWrite (asm_file, current_node -> left_branch);
+    IntReprOperatorOrAndWrite (asm_file, current_node -> left_branch);
 
     fprintf (asm_file, "push 0\n"
                        "je end_while_%zu\n", curr_while_number);
 
-    AsmFileLangOperatorWrite (asm_file, current_node -> right_branch);
+    IntReprLangOperatorWrite (asm_file, current_node -> right_branch);
 
     fprintf (asm_file, "jmp while_%zu\n"
                        ":end_while_%zu\n",
@@ -320,7 +365,7 @@ BackendFuncStatus AsmFileOperatorWhileWrite (FILE *asm_file, const TreeNode *cur
     return BACKEND_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus AsmFileOperatorOrAndWrite (FILE *asm_file, const TreeNode *current_node) {
+BackendFuncStatus IntReprOperatorOrAndWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
@@ -328,13 +373,13 @@ BackendFuncStatus AsmFileOperatorOrAndWrite (FILE *asm_file, const TreeNode *cur
 
     if (NODE_TYPE == LANGUAGE_OPERATOR && (NODE_LANG_OPERATOR == OR || NODE_LANG_OPERATOR == AND)) {
 
-        AsmFileOperatorOrAndWrite      (asm_file, current_node -> left_branch);
+        IntReprOperatorOrAndWrite      (asm_file, current_node -> left_branch);
 
-        AsmFileOperatorComparisonWrite (asm_file, current_node -> right_branch);
+        IntReprOperatorComparisonWrite (asm_file, current_node -> right_branch);
     }
 
     else
-        return AsmFileOperatorComparisonWrite (asm_file, current_node);
+        return IntReprOperatorComparisonWrite (asm_file, current_node);
 
     if (NODE_TYPE == LANGUAGE_OPERATOR)
         switch (NODE_LANG_OPERATOR) {
@@ -354,7 +399,7 @@ BackendFuncStatus AsmFileOperatorOrAndWrite (FILE *asm_file, const TreeNode *cur
     return BACKEND_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus AsmFileOperatorComparisonWrite (FILE *asm_file, const TreeNode *current_node) {
+BackendFuncStatus IntReprOperatorComparisonWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
@@ -367,16 +412,16 @@ BackendFuncStatus AsmFileOperatorComparisonWrite (FILE *asm_file, const TreeNode
             NODE_MATH_OPERATOR == OPERATOR_EQUAL ||
             NODE_MATH_OPERATOR == OPERATOR_NOT_EQUAL) {
 
-            AsmFileMathExpressionWrite (asm_file, current_node -> left_branch);
-            AsmFileMathExpressionWrite (asm_file, current_node -> right_branch);
+            IntReprMathExpressionWrite (asm_file, current_node -> left_branch);
+            IntReprMathExpressionWrite (asm_file, current_node -> right_branch);
         }
 
         else
-            AsmFileMathExpressionWrite (asm_file, current_node);
+            IntReprMathExpressionWrite (asm_file, current_node);
     }
 
     else if (NODE_TYPE == NUMBER || NODE_TYPE == VARIABLE)
-        AsmFileMathExpressionWrite (asm_file, current_node);
+        IntReprMathExpressionWrite (asm_file, current_node);
 
     else
         return BACKEND_FUNC_STATUS_FAIL;
@@ -429,22 +474,22 @@ BackendFuncStatus AsmFileOperatorComparisonWrite (FILE *asm_file, const TreeNode
 }
 
 
-BackendFuncStatus AsmFileConditionWrite (FILE *asm_file, const TreeNode *current_node) {
+BackendFuncStatus IntReprConditionWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
     MATH_TREE_NODE_VERIFY (current_node, BACKEND);
 
-    return AsmFileOperatorOrAndWrite (asm_file, current_node);
+    return IntReprOperatorOrAndWrite (asm_file, current_node);
 }
 
-BackendFuncStatus AsmFileOperatorAssignWrite (FILE *asm_file, const TreeNode *current_node) {
+BackendFuncStatus IntReprOperatorAssignWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
     MATH_TREE_NODE_VERIFY (current_node, BACKEND);
 
-    AsmFileMathExpressionWrite (asm_file, current_node -> right_branch);
+    IntReprMathExpressionWrite (asm_file, current_node -> right_branch);
 
     current_node = current_node -> left_branch;
     fprintf (asm_file, "pop [rbx+%zu]\n", (size_t) NODE_VALUE);
@@ -452,7 +497,7 @@ BackendFuncStatus AsmFileOperatorAssignWrite (FILE *asm_file, const TreeNode *cu
     return BACKEND_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus AsmFileMathExpressionWrite (FILE *asm_file, const TreeNode *current_node) {
+BackendFuncStatus IntReprMathExpressionWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
@@ -465,18 +510,18 @@ BackendFuncStatus AsmFileMathExpressionWrite (FILE *asm_file, const TreeNode *cu
 
         case NUMBER:
         case VARIABLE:
-            AsmFileVarOrNumWrite (asm_file, current_node);
+            IntReprVarOrNumWrite (asm_file, current_node);
             return BACKEND_FUNC_STATUS_OK;
 
         case LANGUAGE_OPERATOR:
             switch (NODE_LANG_OPERATOR) {
 
                 case FUNC_CALL:
-                    AsmFileFuncCallWrite (asm_file, current_node -> left_branch);
+                    IntReprFuncCallWrite (asm_file, current_node -> left_branch);
                     return BACKEND_FUNC_STATUS_OK;
 
                 case READ:
-                    AsmFileOperatorReadWrite (asm_file, current_node);
+                    IntReprOperatorReadWrite (asm_file, current_node);
                     return BACKEND_FUNC_STATUS_OK;
 
                 default:
@@ -490,16 +535,16 @@ BackendFuncStatus AsmFileMathExpressionWrite (FILE *asm_file, const TreeNode *cu
     switch (NODE_TYPE) {
 
         case BINARY_OPERATOR:
-            if (AsmFileMathExpressionWrite (asm_file, current_node -> left_branch) == BACKEND_FUNC_STATUS_FAIL)
+            if (IntReprMathExpressionWrite (asm_file, current_node -> left_branch) == BACKEND_FUNC_STATUS_FAIL)
                 return BACKEND_FUNC_STATUS_FAIL;
 
-            if (AsmFileMathExpressionWrite (asm_file, current_node -> right_branch) == BACKEND_FUNC_STATUS_FAIL)
+            if (IntReprMathExpressionWrite (asm_file, current_node -> right_branch) == BACKEND_FUNC_STATUS_FAIL)
                 return BACKEND_FUNC_STATUS_FAIL;
 
             break;
 
         case UNARY_OPERATOR:
-            if (AsmFileMathExpressionWrite (asm_file, current_node -> left_branch) == BACKEND_FUNC_STATUS_FAIL)
+            if (IntReprMathExpressionWrite (asm_file, current_node -> left_branch) == BACKEND_FUNC_STATUS_FAIL)
                 return BACKEND_FUNC_STATUS_FAIL;
 
             break;
@@ -508,20 +553,20 @@ BackendFuncStatus AsmFileMathExpressionWrite (FILE *asm_file, const TreeNode *cu
             return BACKEND_FUNC_STATUS_OK;
     }
 
-    if (AsmFileMathOperatorWrite (asm_file, current_node) == BACKEND_FUNC_STATUS_FAIL)
+    if (IntReprMathOperatorWrite (asm_file, current_node) == BACKEND_FUNC_STATUS_FAIL)
         return BACKEND_FUNC_STATUS_FAIL;
 
     return BACKEND_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus AsmFileFuncCallWrite (FILE *asm_file, const TreeNode *current_node) {
+BackendFuncStatus IntReprFuncCallWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
     MATH_TREE_NODE_VERIFY (current_node, BACKEND);
 
     if (current_node -> left_branch)
-        AsmFileFuncPassedArgsWrite (asm_file, current_node -> left_branch);
+        IntReprFuncPassedArgsWrite (asm_file, current_node -> left_branch);
 
     fprintf (asm_file, "call %s\n", (char *) ((size_t) NODE_VALUE));
     fprintf (asm_file, "push rax\n");
@@ -529,7 +574,7 @@ BackendFuncStatus AsmFileFuncCallWrite (FILE *asm_file, const TreeNode *current_
     return BACKEND_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus AsmFileFuncPassedArgsWrite (FILE *asm_file, const TreeNode *current_node) {
+BackendFuncStatus IntReprFuncPassedArgsWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
@@ -540,12 +585,12 @@ BackendFuncStatus AsmFileFuncPassedArgsWrite (FILE *asm_file, const TreeNode *cu
 
     if (NODE_TYPE == LANGUAGE_OPERATOR && NODE_LANG_OPERATOR == COMMA) {
 
-        AsmFileFuncPassedArgsWrite (asm_file, current_node -> left_branch);
+        IntReprFuncPassedArgsWrite (asm_file, current_node -> left_branch);
 
         current_node = current_node -> right_branch;
     }
 
-    if (AsmFileMathExpressionWrite (asm_file, current_node) == BACKEND_FUNC_STATUS_FAIL)
+    if (IntReprMathExpressionWrite (asm_file, current_node) == BACKEND_FUNC_STATUS_FAIL)
         return BACKEND_FUNC_STATUS_FAIL;
 
         //TODO make call_func as argument
@@ -553,7 +598,7 @@ BackendFuncStatus AsmFileFuncPassedArgsWrite (FILE *asm_file, const TreeNode *cu
     return BACKEND_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus AsmFileVarOrNumWrite (FILE *asm_file, const TreeNode *current_node) {
+BackendFuncStatus IntReprVarOrNumWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
@@ -571,7 +616,7 @@ BackendFuncStatus AsmFileVarOrNumWrite (FILE *asm_file, const TreeNode *current_
     return BACKEND_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus AsmFileMathOperatorWrite (FILE *asm_file, const TreeNode *current_node) {
+BackendFuncStatus IntReprMathOperatorWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
