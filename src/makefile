@@ -7,7 +7,7 @@ WARNINGS=-Wshadow -Winit-self -Wcast-align -Wundef -Wfloat-equal -Winline -Wredu
 	 -Wempty-body -Wformat-security -Wformat=2 -Wignored-qualifiers -Wlogical-op -Wno-missing-field-initializers \
 	 -Wnon-virtual-dtor -Woverloaded-virtual -Wpointer-arith -Wsign-promo -Wstack-usage=8192 -Wstrict-aliasing \
 	 -Wstrict-null-sentinel -Wtype-limits -Wwrite-strings -Werror=vla -D_DEBUG -D_EJUDGE_CLIENT_SIDE 
-SOURCES= main.cpp ASTtoIR/ast_to_ir.cpp \
+SOURCES= main.cpp ASTtoIR/ast_to_ir.cpp ASTtoIR/ir_log.cpp \
 	 ../lib/tree/tree_func.cpp ../lib/tree/tree_log.cpp \
 	 ../lib/tree/math_tree/math_tree_func.cpp ../lib/tree/math_tree/math_operation.cpp \
        	 ../lib/oneginlib/functions_for_input.cpp \
