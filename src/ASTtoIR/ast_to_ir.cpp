@@ -11,51 +11,51 @@
 
 #include "ast_to_ir.h"
 
-BackendFuncStatus IntReprCtor (IntRepr *interm_repr) {
+IntReprFuncStatus IntReprCtor (IntRepr *interm_repr) {
 
     assert (interm_repr);
 
-    interm_repr -> size = 0;
+    IR_SIZE_ = 0;
 
     IntReprDataCtor (interm_repr);
 
-    return BACKEND_FUNC_STATUS_OK;
+    return IR_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus IntReprDataCtor (IntRepr *interm_repr) {
+IntReprFuncStatus IntReprDataCtor (IntRepr *interm_repr) {
 
-    interm_repr -> cell = (IntReprCell *) calloc (1, sizeof (IntReprCell));
-    assert (interm_repr -> cell);
+    IR_CELL_ = (IntReprCell *) calloc (1, sizeof (IntReprCell));
+    assert (IR_CELL_);
 
-    return BACKEND_FUNC_STATUS_OK;
+    return IR_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus IntReprDataDtor (IntRepr *interm_repr) {
+IntReprFuncStatus IntReprDataDtor (IntRepr *interm_repr) {
 
     assert (interm_repr);
 
-    size_t all_cells_size = sizeof (IntReprCell) * (interm_repr -> size);
+    size_t all_cells_size = sizeof (IntReprCell) * IR_SIZE_;
 
-    memset (interm_repr -> cell, 0, all_cells_size);
+    memset (IR_CELL_, 0, all_cells_size);
 
-    free (interm_repr -> cell);
-    interm_repr -> cell = NULL;
+    free (IR_CELL_);
+    IR_CELL_ = NULL;
 
-    return BACKEND_FUNC_STATUS_OK;
+    return IR_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus IntReprDtor (IntRepr *interm_repr) {
+IntReprFuncStatus IntReprDtor (IntRepr *interm_repr) {
 
     assert (interm_repr);
 
     IntReprDataDtor (interm_repr);
 
-    interm_repr -> size = 0;
+    IR_SIZE_ = 0;
 
-    return BACKEND_FUNC_STATUS_OK;
+    return IR_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus TreeToIntRepr (FILE *asm_file, const Tree *lang_tree) {
+IntReprFuncStatus TreeToIntRepr (FILE *asm_file, const Tree *lang_tree) {
 
     assert (asm_file);
     assert (lang_tree);
@@ -64,10 +64,10 @@ BackendFuncStatus TreeToIntRepr (FILE *asm_file, const Tree *lang_tree) {
 
     IntReprNewFuncWrite (asm_file, lang_tree -> root);
 
-    return BACKEND_FUNC_STATUS_OK;
+    return IR_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus IntReprBeginAndEnd (FILE *asm_file) {
+IntReprFuncStatus IntReprBeginAndEnd (FILE *asm_file) {
 
     assert (asm_file);
 
@@ -78,14 +78,14 @@ BackendFuncStatus IntReprBeginAndEnd (FILE *asm_file) {
                        "call main\n"
                        "hlt\n\n");
 
-    return BACKEND_FUNC_STATUS_OK;
+    return IR_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus IntReprFuncNameWrite (FILE *asm_file, const TreeNode *current_node) {
+IntReprFuncStatus IntReprFuncNameWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
-    MATH_TREE_NODE_VERIFY (current_node, BACKEND);
+    MATH_TREE_NODE_VERIFY (current_node, IR);
 
     fprintf (asm_file, ":");
     fprintf (asm_file, "%s\n", (char *) ((size_t) NODE_VALUE));
@@ -98,17 +98,17 @@ BackendFuncStatus IntReprFuncNameWrite (FILE *asm_file, const TreeNode *current_
                        "add\n"
                        "pop rdx\n");   // 16 variables in func is max
 
-    return BACKEND_FUNC_STATUS_OK;
+    return IR_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus IntReprInitFuncArgsWrite (FILE *asm_file, const TreeNode *current_node) {
+IntReprFuncStatus IntReprInitFuncArgsWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
-    MATH_TREE_NODE_VERIFY (current_node, BACKEND);
+    MATH_TREE_NODE_VERIFY (current_node, IR);
 
     if (!current_node)
-        return BACKEND_FUNC_STATUS_OK;
+        return IR_FUNC_STATUS_OK;
 
     const TreeNode *current_arg_node = current_node;
 
@@ -124,7 +124,7 @@ BackendFuncStatus IntReprInitFuncArgsWrite (FILE *asm_file, const TreeNode *curr
                 break;
 
             default:
-                return BACKEND_FUNC_STATUS_FAIL;
+                return IR_FUNC_STATUS_FAIL;
         }
 
         fprintf (asm_file, "pop rcx\n");
@@ -140,21 +140,21 @@ BackendFuncStatus IntReprInitFuncArgsWrite (FILE *asm_file, const TreeNode *curr
                 break;
 
             case INIT:
-                return BACKEND_FUNC_STATUS_OK;
+                return IR_FUNC_STATUS_OK;
 
             default:
-                return BACKEND_FUNC_STATUS_FAIL;
+                return IR_FUNC_STATUS_FAIL;
         }
     }
 
-    return BACKEND_FUNC_STATUS_FAIL;
+    return IR_FUNC_STATUS_FAIL;
 }
 
-BackendFuncStatus IntReprNewFuncWrite (FILE *asm_file, const TreeNode *current_node) {
+IntReprFuncStatus IntReprNewFuncWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
-    MATH_TREE_NODE_VERIFY (current_node, BACKEND);
+    MATH_TREE_NODE_VERIFY (current_node, IR);
 
     if (NODE_TYPE == LANGUAGE_OPERATOR) {
 
@@ -171,7 +171,7 @@ BackendFuncStatus IntReprNewFuncWrite (FILE *asm_file, const TreeNode *current_n
                 break;
 
             default:
-                return BACKEND_FUNC_STATUS_FAIL;
+                return IR_FUNC_STATUS_FAIL;
         }
 
         IntReprFuncNameWrite     (asm_file, CURRENT_FUNC_NAME_NODE (func_node));
@@ -188,27 +188,27 @@ BackendFuncStatus IntReprNewFuncWrite (FILE *asm_file, const TreeNode *current_n
                 break;
 
             case INIT:
-                return BACKEND_FUNC_STATUS_OK;
+                return IR_FUNC_STATUS_OK;
 
             default:
-                return BACKEND_FUNC_STATUS_FAIL;
+                return IR_FUNC_STATUS_FAIL;
         }
     }
 
-    return BACKEND_FUNC_STATUS_FAIL;
+    return IR_FUNC_STATUS_FAIL;
 }
 
-BackendFuncStatus IntReprLangOperatorWrite (FILE *asm_file, const TreeNode *current_node) {
+IntReprFuncStatus IntReprLangOperatorWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
     if (!current_node)
-        return BACKEND_FUNC_STATUS_OK;
+        return IR_FUNC_STATUS_OK;
 
-    MATH_TREE_NODE_VERIFY (current_node, BACKEND);
+    MATH_TREE_NODE_VERIFY (current_node, IR);
 
     if (!(NODE_TYPE == LANGUAGE_OPERATOR && NODE_LANG_OPERATOR == END_LINE))
-        return BACKEND_FUNC_STATUS_FAIL;
+        return IR_FUNC_STATUS_FAIL;
 
     const TreeNode *end_line_node = current_node;
 
@@ -250,33 +250,33 @@ BackendFuncStatus IntReprLangOperatorWrite (FILE *asm_file, const TreeNode *curr
                 break;
 
             default:
-                return BACKEND_FUNC_STATUS_FAIL;
+                return IR_FUNC_STATUS_FAIL;
         }
 
     return IntReprLangOperatorWrite (asm_file, end_line_node -> right_branch);
 }
 
-BackendFuncStatus IntReprOperatorReadWrite (FILE *asm_file, const TreeNode *current_node) {
+IntReprFuncStatus IntReprOperatorReadWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
-    MATH_TREE_NODE_VERIFY (current_node, BACKEND);
+    MATH_TREE_NODE_VERIFY (current_node, IR);
 
     if (NODE_TYPE == LANGUAGE_OPERATOR && NODE_LANG_OPERATOR == READ) {
 
         fprintf (asm_file, "in\n");
 
-        return BACKEND_FUNC_STATUS_OK;
+        return IR_FUNC_STATUS_OK;
     }
 
-    return BACKEND_FUNC_STATUS_FAIL;
+    return IR_FUNC_STATUS_FAIL;
 }
 
-BackendFuncStatus IntReprOperatorPrintWrite (FILE *asm_file, const TreeNode *current_node) {
+IntReprFuncStatus IntReprOperatorPrintWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
-    MATH_TREE_NODE_VERIFY (current_node, BACKEND);
+    MATH_TREE_NODE_VERIFY (current_node, IR);
 
     if (NODE_TYPE == LANGUAGE_OPERATOR && NODE_LANG_OPERATOR == PRINT) {
 
@@ -284,17 +284,17 @@ BackendFuncStatus IntReprOperatorPrintWrite (FILE *asm_file, const TreeNode *cur
 
         fprintf (asm_file, "out\n");
 
-        return BACKEND_FUNC_STATUS_OK;
+        return IR_FUNC_STATUS_OK;
     }
 
-    return BACKEND_FUNC_STATUS_FAIL;
+    return IR_FUNC_STATUS_FAIL;
 }
 
-BackendFuncStatus IntReprOperatorRetWrite (FILE *asm_file, const TreeNode *current_node) {
+IntReprFuncStatus IntReprOperatorRetWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
-    MATH_TREE_NODE_VERIFY (current_node, BACKEND);
+    MATH_TREE_NODE_VERIFY (current_node, IR);
 
     if (NODE_TYPE == LANGUAGE_OPERATOR && NODE_LANG_OPERATOR == FUNC_RET) {
 
@@ -306,18 +306,18 @@ BackendFuncStatus IntReprOperatorRetWrite (FILE *asm_file, const TreeNode *curre
                            "pop rbx\n"
                            "ret\n");
 
-        return BACKEND_FUNC_STATUS_OK;
+        return IR_FUNC_STATUS_OK;
     }
 
-    return BACKEND_FUNC_STATUS_FAIL;
+    return IR_FUNC_STATUS_FAIL;
 
 }
 
-BackendFuncStatus IntReprOperatorIfWrite (FILE *asm_file, const TreeNode *current_node) {
+IntReprFuncStatus IntReprOperatorIfWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
-    MATH_TREE_NODE_VERIFY (current_node, BACKEND);
+    MATH_TREE_NODE_VERIFY (current_node, IR);
 
     static size_t operator_if_number = 0;
     const  size_t curr_if_number     = operator_if_number;
@@ -335,14 +335,14 @@ BackendFuncStatus IntReprOperatorIfWrite (FILE *asm_file, const TreeNode *curren
 
     fprintf (asm_file, ":end_if_%zu\n", curr_if_number);
 
-    return BACKEND_FUNC_STATUS_OK;
+    return IR_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus IntReprOperatorWhileWrite (FILE *asm_file, const TreeNode *current_node) {
+IntReprFuncStatus IntReprOperatorWhileWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
-    MATH_TREE_NODE_VERIFY (current_node, BACKEND);
+    MATH_TREE_NODE_VERIFY (current_node, IR);
 
     static size_t operator_while_number = 0;
     const  size_t curr_while_number     = operator_while_number;
@@ -362,14 +362,14 @@ BackendFuncStatus IntReprOperatorWhileWrite (FILE *asm_file, const TreeNode *cur
                        ":end_while_%zu\n",
                        curr_while_number, curr_while_number);
 
-    return BACKEND_FUNC_STATUS_OK;
+    return IR_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus IntReprOperatorOrAndWrite (FILE *asm_file, const TreeNode *current_node) {
+IntReprFuncStatus IntReprOperatorOrAndWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
-    MATH_TREE_NODE_VERIFY (current_node, BACKEND);
+    MATH_TREE_NODE_VERIFY (current_node, IR);
 
     if (NODE_TYPE == LANGUAGE_OPERATOR && (NODE_LANG_OPERATOR == OR || NODE_LANG_OPERATOR == AND)) {
 
@@ -393,17 +393,17 @@ BackendFuncStatus IntReprOperatorOrAndWrite (FILE *asm_file, const TreeNode *cur
                 break;
 
             default:
-                return BACKEND_FUNC_STATUS_FAIL;
+                return IR_FUNC_STATUS_FAIL;
         }
 
-    return BACKEND_FUNC_STATUS_OK;
+    return IR_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus IntReprOperatorComparisonWrite (FILE *asm_file, const TreeNode *current_node) {
+IntReprFuncStatus IntReprOperatorComparisonWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
-    MATH_TREE_NODE_VERIFY (current_node, BACKEND);
+    MATH_TREE_NODE_VERIFY (current_node, IR);
 
     if (NODE_TYPE == BINARY_OPERATOR) {
 
@@ -424,7 +424,7 @@ BackendFuncStatus IntReprOperatorComparisonWrite (FILE *asm_file, const TreeNode
         IntReprMathExpressionWrite (asm_file, current_node);
 
     else
-        return BACKEND_FUNC_STATUS_FAIL;
+        return IR_FUNC_STATUS_FAIL;
 
 
     if (NODE_TYPE == BINARY_OPERATOR)
@@ -455,7 +455,7 @@ BackendFuncStatus IntReprOperatorComparisonWrite (FILE *asm_file, const TreeNode
                 break;
 
             default:
-                return BACKEND_FUNC_STATUS_FAIL;
+                return IR_FUNC_STATUS_FAIL;
         }
 
     static size_t comparison_num = 0;
@@ -470,62 +470,62 @@ BackendFuncStatus IntReprOperatorComparisonWrite (FILE *asm_file, const TreeNode
 
     comparison_num++;
 
-    return BACKEND_FUNC_STATUS_OK;
+    return IR_FUNC_STATUS_OK;
 }
 
 
-BackendFuncStatus IntReprConditionWrite (FILE *asm_file, const TreeNode *current_node) {
+IntReprFuncStatus IntReprConditionWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
-    MATH_TREE_NODE_VERIFY (current_node, BACKEND);
+    MATH_TREE_NODE_VERIFY (current_node, IR);
 
     return IntReprOperatorOrAndWrite (asm_file, current_node);
 }
 
-BackendFuncStatus IntReprOperatorAssignWrite (FILE *asm_file, const TreeNode *current_node) {
+IntReprFuncStatus IntReprOperatorAssignWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
-    MATH_TREE_NODE_VERIFY (current_node, BACKEND);
+    MATH_TREE_NODE_VERIFY (current_node, IR);
 
     IntReprMathExpressionWrite (asm_file, current_node -> right_branch);
 
     current_node = current_node -> left_branch;
     fprintf (asm_file, "pop [rbx+%zu]\n", (size_t) NODE_VALUE);
 
-    return BACKEND_FUNC_STATUS_OK;
+    return IR_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus IntReprMathExpressionWrite (FILE *asm_file, const TreeNode *current_node) {
+IntReprFuncStatus IntReprMathExpressionWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
     if (!current_node)
-        return BACKEND_FUNC_STATUS_FAIL;
+        return IR_FUNC_STATUS_FAIL;
 
-    MATH_TREE_NODE_VERIFY (current_node, BACKEND);
+    MATH_TREE_NODE_VERIFY (current_node, IR);
 
     switch (NODE_TYPE) {
 
         case NUMBER:
         case VARIABLE:
             IntReprVarOrNumWrite (asm_file, current_node);
-            return BACKEND_FUNC_STATUS_OK;
+            return IR_FUNC_STATUS_OK;
 
         case LANGUAGE_OPERATOR:
             switch (NODE_LANG_OPERATOR) {
 
                 case FUNC_CALL:
                     IntReprFuncCallWrite (asm_file, current_node -> left_branch);
-                    return BACKEND_FUNC_STATUS_OK;
+                    return IR_FUNC_STATUS_OK;
 
                 case READ:
                     IntReprOperatorReadWrite (asm_file, current_node);
-                    return BACKEND_FUNC_STATUS_OK;
+                    return IR_FUNC_STATUS_OK;
 
                 default:
-                    return BACKEND_FUNC_STATUS_FAIL;
+                    return IR_FUNC_STATUS_FAIL;
             }
 
         default:
@@ -535,35 +535,35 @@ BackendFuncStatus IntReprMathExpressionWrite (FILE *asm_file, const TreeNode *cu
     switch (NODE_TYPE) {
 
         case BINARY_OPERATOR:
-            if (IntReprMathExpressionWrite (asm_file, current_node -> left_branch) == BACKEND_FUNC_STATUS_FAIL)
-                return BACKEND_FUNC_STATUS_FAIL;
+            if (IntReprMathExpressionWrite (asm_file, current_node -> left_branch) == IR_FUNC_STATUS_FAIL)
+                return IR_FUNC_STATUS_FAIL;
 
-            if (IntReprMathExpressionWrite (asm_file, current_node -> right_branch) == BACKEND_FUNC_STATUS_FAIL)
-                return BACKEND_FUNC_STATUS_FAIL;
+            if (IntReprMathExpressionWrite (asm_file, current_node -> right_branch) == IR_FUNC_STATUS_FAIL)
+                return IR_FUNC_STATUS_FAIL;
 
             break;
 
         case UNARY_OPERATOR:
-            if (IntReprMathExpressionWrite (asm_file, current_node -> left_branch) == BACKEND_FUNC_STATUS_FAIL)
-                return BACKEND_FUNC_STATUS_FAIL;
+            if (IntReprMathExpressionWrite (asm_file, current_node -> left_branch) == IR_FUNC_STATUS_FAIL)
+                return IR_FUNC_STATUS_FAIL;
 
             break;
 
         default:
-            return BACKEND_FUNC_STATUS_OK;
+            return IR_FUNC_STATUS_OK;
     }
 
-    if (IntReprMathOperatorWrite (asm_file, current_node) == BACKEND_FUNC_STATUS_FAIL)
-        return BACKEND_FUNC_STATUS_FAIL;
+    if (IntReprMathOperatorWrite (asm_file, current_node) == IR_FUNC_STATUS_FAIL)
+        return IR_FUNC_STATUS_FAIL;
 
-    return BACKEND_FUNC_STATUS_OK;
+    return IR_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus IntReprFuncCallWrite (FILE *asm_file, const TreeNode *current_node) {
+IntReprFuncStatus IntReprFuncCallWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
-    MATH_TREE_NODE_VERIFY (current_node, BACKEND);
+    MATH_TREE_NODE_VERIFY (current_node, IR);
 
     if (current_node -> left_branch)
         IntReprFuncPassedArgsWrite (asm_file, current_node -> left_branch);
@@ -571,17 +571,17 @@ BackendFuncStatus IntReprFuncCallWrite (FILE *asm_file, const TreeNode *current_
     fprintf (asm_file, "call %s\n", (char *) ((size_t) NODE_VALUE));
     fprintf (asm_file, "push rax\n");
 
-    return BACKEND_FUNC_STATUS_OK;
+    return IR_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus IntReprFuncPassedArgsWrite (FILE *asm_file, const TreeNode *current_node) {
+IntReprFuncStatus IntReprFuncPassedArgsWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
     if (!current_node)
-        return BACKEND_FUNC_STATUS_OK;
+        return IR_FUNC_STATUS_OK;
 
-    MATH_TREE_NODE_VERIFY (current_node, BACKEND);
+    MATH_TREE_NODE_VERIFY (current_node, IR);
 
     if (NODE_TYPE == LANGUAGE_OPERATOR && NODE_LANG_OPERATOR == COMMA) {
 
@@ -590,19 +590,19 @@ BackendFuncStatus IntReprFuncPassedArgsWrite (FILE *asm_file, const TreeNode *cu
         current_node = current_node -> right_branch;
     }
 
-    if (IntReprMathExpressionWrite (asm_file, current_node) == BACKEND_FUNC_STATUS_FAIL)
-        return BACKEND_FUNC_STATUS_FAIL;
+    if (IntReprMathExpressionWrite (asm_file, current_node) == IR_FUNC_STATUS_FAIL)
+        return IR_FUNC_STATUS_FAIL;
 
         //TODO make call_func as argument
 
-    return BACKEND_FUNC_STATUS_OK;
+    return IR_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus IntReprVarOrNumWrite (FILE *asm_file, const TreeNode *current_node) {
+IntReprFuncStatus IntReprVarOrNumWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
-    MATH_TREE_NODE_VERIFY (current_node, BACKEND);
+    MATH_TREE_NODE_VERIFY (current_node, IR);
 
     if (NODE_TYPE == NUMBER)
         fprintf (asm_file, "push %lf\n", NODE_VALUE);
@@ -611,16 +611,16 @@ BackendFuncStatus IntReprVarOrNumWrite (FILE *asm_file, const TreeNode *current_
         fprintf (asm_file, "push [rbx+%zu]\n", (size_t) NODE_VALUE);
 
     else
-        return BACKEND_FUNC_STATUS_FAIL;
+        return IR_FUNC_STATUS_FAIL;
 
-    return BACKEND_FUNC_STATUS_OK;
+    return IR_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus IntReprMathOperatorWrite (FILE *asm_file, const TreeNode *current_node) {
+IntReprFuncStatus IntReprMathOperatorWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
 
-    MATH_TREE_NODE_VERIFY (current_node, BACKEND);
+    MATH_TREE_NODE_VERIFY (current_node, IR);
 
     if (NODE_TYPE == BINARY_OPERATOR || NODE_TYPE == UNARY_OPERATOR)
         switch (NODE_MATH_OPERATOR) {
@@ -646,20 +646,20 @@ BackendFuncStatus IntReprMathOperatorWrite (FILE *asm_file, const TreeNode *curr
                 break;
 
             default:
-                return BACKEND_FUNC_STATUS_FAIL;
+                return IR_FUNC_STATUS_FAIL;
         }
 
     else
-        return BACKEND_FUNC_STATUS_FAIL;
+        return IR_FUNC_STATUS_FAIL;
 
-    return BACKEND_FUNC_STATUS_OK;
+    return IR_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus LangTreeVarsSet (Tree *lang_tree, const NameTable *lang_name_table) {
+IntReprFuncStatus LangTreeVarsSet (Tree *lang_tree, const NameTable *lang_name_table) {
 
-    MATH_TREE_VERIFY (lang_tree, BACKEND, lang_name_table);
+    MATH_TREE_VERIFY (lang_tree, IR, lang_name_table);
 
-    NAME_TABLE_VERIFY (lang_name_table, BACKEND);
+    NAME_TABLE_VERIFY (lang_name_table, IR);
 
     TreeNode *current_node = lang_tree -> root;
 
@@ -681,7 +681,7 @@ BackendFuncStatus LangTreeVarsSet (Tree *lang_tree, const NameTable *lang_name_t
                 break;
 
             default:
-                return BACKEND_FUNC_STATUS_FAIL;
+                return IR_FUNC_STATUS_FAIL;
         }
 
         NODE_VALUE = (double) ((size_t) NameTableVariableFind ((size_t) NODE_VALUE, lang_name_table));
@@ -698,7 +698,7 @@ BackendFuncStatus LangTreeVarsSet (Tree *lang_tree, const NameTable *lang_name_t
                 break;
 
             case INIT:
-                return BACKEND_FUNC_STATUS_OK;
+                return IR_FUNC_STATUS_OK;
 
             default:
                 break;
@@ -707,18 +707,18 @@ BackendFuncStatus LangTreeVarsSet (Tree *lang_tree, const NameTable *lang_name_t
         NameTableDtor (&local_func_name_table);
     }
 
-    return BACKEND_FUNC_STATUS_OK;
+    return IR_FUNC_STATUS_OK;
 }
 
-BackendFuncStatus LangFuncVarsSet (TreeNode *current_node, const NameTable *lang_name_table,
+IntReprFuncStatus LangFuncVarsSet (TreeNode *current_node, const NameTable *lang_name_table,
                                    NameTable *local_func_name_table) {
 
     if (!current_node)
-        return BACKEND_FUNC_STATUS_OK;
+        return IR_FUNC_STATUS_OK;
 
-    MATH_TREE_NODE_VERIFY (current_node, BACKEND);
+    MATH_TREE_NODE_VERIFY (current_node, IR);
 
-    NAME_TABLE_VERIFY (local_func_name_table, BACKEND);
+    NAME_TABLE_VERIFY (local_func_name_table, IR);
 
     if (NODE_TYPE == VARIABLE) {
 
@@ -734,7 +734,7 @@ BackendFuncStatus LangFuncVarsSet (TreeNode *current_node, const NameTable *lang
 
         NODE_VALUE = (double) current_var_index;
 
-        return BACKEND_FUNC_STATUS_OK;
+        return IR_FUNC_STATUS_OK;
     }
 
     if (NODE_TYPE == LANGUAGE_OPERATOR && NODE_LANG_OPERATOR == FUNC_CALL) {
@@ -751,6 +751,6 @@ BackendFuncStatus LangFuncVarsSet (TreeNode *current_node, const NameTable *lang
         LangFuncVarsSet (current_node -> right_branch, lang_name_table, local_func_name_table);
     }
 
-    return BACKEND_FUNC_STATUS_OK;
+    return IR_FUNC_STATUS_OK;
 }
 
