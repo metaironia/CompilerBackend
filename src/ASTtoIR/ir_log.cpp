@@ -32,6 +32,9 @@ IntReprFuncStatus IntReprDump (const IntRepr *interm_repr) {
 
     assert (interm_repr);
 
+    IR_LOG_PRINT_ ("IR capacity = %" PRId64 "\n", IR_CAPACITY_);
+    IR_LOG_PRINT_ ("IR size     = %" PRId64 "\n", IR_SIZE_);
+
     for (size_t i = 0; i < (size_t) (IR_SIZE_); i++) {
 
         IR_LOG_PRINT_ ("cell #%zu", i);
