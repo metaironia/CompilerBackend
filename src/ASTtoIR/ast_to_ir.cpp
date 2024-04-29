@@ -671,8 +671,7 @@ IntReprFuncStatus IntReprMathOperatorWrite (FILE *asm_file, const TreeNode *curr
 
 IntReprFuncStatus LangTreeVarsSet (Tree *lang_tree, const NameTable *lang_name_table) {
 
-    MATH_TREE_VERIFY (lang_tree, IR, lang_name_table);
-
+    MATH_TREE_VERIFY  (lang_tree,       IR, lang_name_table);
     NAME_TABLE_VERIFY (lang_name_table, IR);
 
     TreeNode *current_node = lang_tree -> root;
@@ -700,7 +699,7 @@ IntReprFuncStatus LangTreeVarsSet (Tree *lang_tree, const NameTable *lang_name_t
 
         NODE_VALUE = (double) ((size_t) NameTableVariableFind ((size_t) NODE_VALUE, lang_name_table));
 
-        LangFuncVarsSet (current_node -> left_branch, lang_name_table, &local_func_name_table);
+        LangFuncVarsSet (current_node -> left_branch,  lang_name_table, &local_func_name_table);
         LangFuncVarsSet (current_node -> right_branch, lang_name_table, &local_func_name_table);
 
         current_node = current_func_node;
@@ -730,14 +729,13 @@ IntReprFuncStatus LangFuncVarsSet (TreeNode *current_node, const NameTable *lang
     if (!current_node)
         return IR_FUNC_STATUS_OK;
 
-    MATH_TREE_NODE_VERIFY (current_node, IR);
-
-    NAME_TABLE_VERIFY (local_func_name_table, IR);
+    MATH_TREE_NODE_VERIFY (current_node,          IR);
+    NAME_TABLE_VERIFY     (local_func_name_table, IR);
 
     if (NODE_TYPE == VARIABLE) {
 
-        const char *current_var_name = NameTableVariableFind ((size_t) NODE_VALUE, lang_name_table);
-        long long current_var_index = NameTableWordFind (local_func_name_table, current_var_name, 0);
+        const char *current_var_name  = NameTableVariableFind ((size_t) NODE_VALUE,   lang_name_table);
+        long long   current_var_index = NameTableWordFind     (local_func_name_table, current_var_name, 0);
 
         if (current_var_index == -1) {
 
@@ -761,7 +759,7 @@ IntReprFuncStatus LangFuncVarsSet (TreeNode *current_node, const NameTable *lang
 
     else {
 
-        LangFuncVarsSet (current_node -> left_branch, lang_name_table, local_func_name_table);
+        LangFuncVarsSet (current_node -> left_branch,  lang_name_table, local_func_name_table);
         LangFuncVarsSet (current_node -> right_branch, lang_name_table, local_func_name_table);
     }
 
