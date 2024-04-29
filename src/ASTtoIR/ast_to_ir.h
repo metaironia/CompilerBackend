@@ -31,26 +31,40 @@ enum IntReprFuncStatus {
 
 enum OperandType {
 
-    OP_REG_RAX,
-    OP_REG_RBX,
-    OP_REG_RCX,
-    OP_REG_RDX,
-    OP_REG_R10,
-    OP_REG_R11,
-    OP_REG_R12,
-    OP_REG_R13,
-    OP_REG_R14
+    IR_OP_IMMEDIATE,
+    IR_OP_REG_RAX,
+    IR_OP_REG_RBX,
+    IR_OP_REG_RCX,
+    IR_OP_REG_RDX,
+    IR_OP_REG_R10,
+    IR_OP_REG_R11,
+    IR_OP_REG_R12,
+    IR_OP_REG_R13,
+    IR_OP_REG_R14
+};
+
+enum CommandType {
+
+    IR_CMD_ADD,
+    IR_CMD_SUB,
+    IR_CMD_MUL,
+    IR_CMD_DIV,
+    IR_CMD_MOV
 };
 
 struct IntReprCell {
 
     const char  *cmd_name;
+    CommandType  cmd_type;
 
-    OperandType  dest_operand;  
-    OperandType  src_operand;
-    int64_t      dest_operand_offset;
-    int64_t      src_operand_offset;
+    OperandType  dest_operand_type;  
+    int64_t      dest_operand_value;
+    int64_t      dest_operand_disp;
     bool         is_dest_operand_mem;
+
+    OperandType  src_operand_type;
+    int64_t      src_operand_value;
+    int64_t      src_operand_disp;
     bool         is_src_operand_mem;
 
     IntReprCell *jump_ptr;
