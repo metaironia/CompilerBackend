@@ -15,7 +15,8 @@ IntReprFuncStatus IntReprCtor (IntRepr *interm_repr) {
 
     assert (interm_repr);
 
-    IR_SIZE_ = 0;
+    IR_SIZE_     = 0;
+    IR_CAPACITY_ = IR_DEFAULT_CAPACITY;
 
     IntReprDataCtor (interm_repr);
 
@@ -24,7 +25,7 @@ IntReprFuncStatus IntReprCtor (IntRepr *interm_repr) {
 
 IntReprFuncStatus IntReprDataCtor (IntRepr *interm_repr) {
 
-    IR_CELL_ = (IntReprCell *) calloc (1, sizeof (IntReprCell));
+    IR_CELL_ = (IntReprCell *) calloc (IR_CAPACITY_, sizeof (IntReprCell));
     assert (IR_CELL_);
 
     return IR_FUNC_STATUS_OK;
@@ -33,10 +34,6 @@ IntReprFuncStatus IntReprDataCtor (IntRepr *interm_repr) {
 IntReprFuncStatus IntReprDataDtor (IntRepr *interm_repr) {
 
     assert (interm_repr);
-
-    size_t all_cells_size = sizeof (IntReprCell) * IR_SIZE_;
-
-    memset (IR_CELL_, 0, all_cells_size);
 
     free (IR_CELL_);
     IR_CELL_ = NULL;
@@ -50,7 +47,24 @@ IntReprFuncStatus IntReprDtor (IntRepr *interm_repr) {
 
     IntReprDataDtor (interm_repr);
 
-    IR_SIZE_ = 0;
+    IR_SIZE_     = 0;
+    IR_CAPACITY_ = 0;
+
+    return IR_FUNC_STATUS_OK;
+}
+
+IntReprFuncStatus IntReprDataRecalloc (IntRepr *interm_repr) {
+
+    assert (interm_repr);
+
+    const size_t all_cells_new_size = sizeof (IntReprCell) * (IR_INCREASE_NUM * IR_CAPACITY_); 
+    const size_t all_cells_old_size = sizeof (IntReprCell) * IR_CAPACITY_;
+
+    IR_CELL_ = (IntReprCell *) realloc (IR_CELL_, all_cells_new_size);
+
+    memset (IR_CELL_, 0, all_cells_new_size - all_cells_old_size);
+
+    IR_CAPACITY_ *= IR_INCREASE_NUM;
 
     return IR_FUNC_STATUS_OK;
 }

@@ -49,7 +49,6 @@ IntReprFuncStatus IntReprCellDump (const IntReprCell *interm_repr_cell) {
     assert (interm_repr_cell);
 
     IR_LOG_PRINT_ ("    command name:                    %s\n",          interm_repr_cell -> cmd_name);
-    IR_LOG_PRINT_ ("    command opcode:                  %" PRIx64 "\n", interm_repr_cell -> cmd_opcode);
     IR_LOG_PRINT_ ("    destination operand:             %d\n",          interm_repr_cell -> dest_operand);
     IR_LOG_PRINT_ ("    source operand:                  %d\n",          interm_repr_cell -> src_operand);
     IR_LOG_PRINT_ ("    destination operand offset:      %" PRIx64 "\n", interm_repr_cell -> dest_operand_offset);

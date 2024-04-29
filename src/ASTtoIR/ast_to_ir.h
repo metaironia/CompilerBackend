@@ -13,10 +13,15 @@
 
 #define IR_SIZE_                                        (interm_repr -> size)
 
+#define IR_CAPACITY_                                    (interm_repr -> capacity)
+
 #define CURRENT_FUNC_NAME_NODE(current_node)            current_node -> right_branch -> left_branch
 
 #define CURRENT_FUNC_FIRST_END_LINE_NODE(current_node)  CURRENT_FUNC_NAME_NODE(current_node) -> right_branch
 
+const int IR_DEFAULT_CAPACITY = 1;
+
+const int IR_INCREASE_NUM = 2;
 
 enum IntReprFuncStatus {
 
@@ -40,7 +45,6 @@ enum OperandType {
 struct IntReprCell {
 
     const char  *cmd_name;
-    int64_t      cmd_opcode;  
 
     OperandType  dest_operand;  
     OperandType  src_operand;
@@ -58,6 +62,7 @@ struct IntRepr {
 
     IntReprCell *cell;
     int64_t      size;
+    int64_t      capacity;
 };
 
 IntReprFuncStatus TreeToIntRepr (FILE *asm_file, const Tree *lang_tree);
@@ -69,6 +74,8 @@ IntReprFuncStatus IntReprDataCtor (IntRepr *interm_repr);
 IntReprFuncStatus IntReprDataDtor (IntRepr *interm_repr);
 
 IntReprFuncStatus IntReprDtor (IntRepr *interm_repr);
+
+IntReprFuncStatus IntReprDataRecalloc (IntRepr *interm_repr);
 
 IntReprFuncStatus IntReprBeginAndEnd (FILE *asm_file);
 
