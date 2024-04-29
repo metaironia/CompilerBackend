@@ -50,16 +50,36 @@ IntReprFuncStatus IntReprCellDump (const IntReprCell *interm_repr_cell) {
 
     IR_LOG_PRINT_ ("    command name:                    %s\n",          interm_repr_cell -> cmd_name);
     IR_LOG_PRINT_ ("    command opcode:                  %" PRIx64 "\n", interm_repr_cell -> cmd_opcode);
+    IR_LOG_PRINT_ ("    destination operand:             %d\n",          interm_repr_cell -> dest_operand);
+    IR_LOG_PRINT_ ("    source operand:                  %d\n",          interm_repr_cell -> src_operand);
+    IR_LOG_PRINT_ ("    destination operand offset:      %" PRIx64 "\n", interm_repr_cell -> dest_operand_offset);
+    IR_LOG_PRINT_ ("    source operand offset:           %" PRIx64 "\n", interm_repr_cell -> src_operand_offset);
+    
+    IR_LOG_PRINT_ ("    is dest operand has mem type:    ");
+
+    IntReprFieldStatePrint (interm_repr_cell -> is_dest_operand_mem);
+        
+    IR_LOG_PRINT_ ("    is source operand has mem type:  ");
+
+    IntReprFieldStatePrint (interm_repr_cell -> is_src_operand_mem);
+
     IR_LOG_PRINT_ ("    jump ptr to IntReprCell:         %p\n",          interm_repr_cell -> jump_ptr);
     IR_LOG_PRINT_ ("    jump addr in x86-64 (RIP-based): %" PRIx64 "\n", interm_repr_cell -> jump_addr);
     
-    IR_LOG_PRINT_ ("    need to patch:                   ");
+    IR_LOG_PRINT_ ("    need patch:                      ");
 
-    if (interm_repr_cell -> need_patch)
+    IntReprFieldStatePrint (interm_repr_cell -> need_patch);
+
+    return IR_FUNC_STATUS_OK;
+}
+
+IntReprFuncStatus IntReprFieldStatePrint (bool field_status) {
+
+    if (field_status)
         IR_LOG_PRINT_ ("YES\n")
     
     else
         IR_LOG_PRINT_ ("NO\n");
 
-    return IR_FUNC_STATUS_OK;
+    return IR_FUNC_STATUS_OK;   
 }

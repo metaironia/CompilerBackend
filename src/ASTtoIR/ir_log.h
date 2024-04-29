@@ -18,4 +18,6 @@ IntReprFuncStatus IntReprDump (const IntRepr *interm_repr);
 
 IntReprFuncStatus IntReprCellDump (const IntReprCell *interm_repr_cell);
 
+IntReprFuncStatus IntReprFieldStatePrint (bool field_status);
+
 #endif

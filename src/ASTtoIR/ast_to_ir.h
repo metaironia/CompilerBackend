@@ -24,10 +24,31 @@ enum IntReprFuncStatus {
     IR_FUNC_STATUS_FAIL
 };
 
+enum OperandType {
+
+    OP_REG_RAX,
+    OP_REG_RBX,
+    OP_REG_RCX,
+    OP_REG_RDX,
+    OP_REG_R10,
+    OP_REG_R11,
+    OP_REG_R12,
+    OP_REG_R13,
+    OP_REG_R14
+};
+
 struct IntReprCell {
 
     const char  *cmd_name;
-    int64_t      cmd_opcode;    
+    int64_t      cmd_opcode;  
+
+    OperandType  dest_operand;  
+    OperandType  src_operand;
+    int64_t      dest_operand_offset;
+    int64_t      src_operand_offset;
+    bool         is_dest_operand_mem;
+    bool         is_src_operand_mem;
+
     IntReprCell *jump_ptr;
     int64_t      jump_addr;
     bool         need_patch;
