@@ -15,6 +15,8 @@
 
 #define IR_CAPACITY_                                    (interm_repr -> capacity)
 
+#define IR_TOP_CELL_                                    (IR_CELL_ + IR_SIZE_)
+
 #define CURRENT_FUNC_NAME_NODE(current_node)            current_node -> right_branch -> left_branch
 
 #define CURRENT_FUNC_FIRST_END_LINE_NODE(current_node)  CURRENT_FUNC_NAME_NODE(current_node) -> right_branch
@@ -49,6 +51,8 @@ enum CommandType {
     IR_CMD_SUB,
     IR_CMD_MUL,
     IR_CMD_DIV,
+    IR_CMD_PUSH,
+    IR_CMD_POP,
     IR_CMD_MOV
 };
 
@@ -91,6 +95,15 @@ IntReprFuncStatus IntReprDtor (IntRepr *interm_repr);
 
 IntReprFuncStatus IntReprDataRecalloc (IntRepr *interm_repr);
 
+IntReprFuncStatus IntReprEmit (IntRepr *interm_repr, 
+                               const char        *cmd_name,          const CommandType cmd_type,
+                               const OperandType  dest_operand_type, const int64_t     dest_operand_value,
+                               const int64_t      dest_operand_disp, const bool        is_dest_operand_mem,
+                               const OperandType  src_operand_type,  const int64_t     src_operand_value,
+                               const int64_t      src_operand_disp,  const bool        is_src_operand_mem,
+                                     IntReprCell *jump_ptr,          const int64_t     jump_addr,
+                               const bool         need_patch);
+
 IntReprFuncStatus IntReprBeginAndEnd (FILE *asm_file);
 
 IntReprFuncStatus IntReprInitFuncArgsWrite (FILE *asm_file, const TreeNode *current_node);
@@ -127,7 +140,7 @@ IntReprFuncStatus IntReprFuncPassedArgsWrite (FILE *asm_file, const TreeNode *cu
 
 IntReprFuncStatus IntReprVarOrNumWrite (FILE *asm_file, const TreeNode *current_node);
 
-IntReprFuncStatus IntReprMathOperatorWrite (FILE *asm_file, const TreeNode *current_node);
+IntReprFuncStatus IntReprMathOperatorWrite (IntRepr *interm_repr, const TreeNode *current_node);
 
 IntReprFuncStatus LangTreeVarsSet (Tree *lang_tree, const NameTable *lang_name_table);
 

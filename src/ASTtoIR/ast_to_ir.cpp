@@ -69,6 +69,39 @@ IntReprFuncStatus IntReprDataRecalloc (IntRepr *interm_repr) {
     return IR_FUNC_STATUS_OK;
 }
 
+IntReprFuncStatus IntReprEmit (IntRepr *interm_repr, 
+                               const char        *cmd_name,          const CommandType cmd_type,
+                               const OperandType  dest_operand_type, const int64_t     dest_operand_value,
+                               const int64_t      dest_operand_disp, const bool        is_dest_operand_mem,
+                               const OperandType  src_operand_type,  const int64_t     src_operand_value,
+                               const int64_t      src_operand_disp,  const bool        is_src_operand_mem,
+                                     IntReprCell *jump_ptr,          const int64_t     jump_addr,
+                               const bool         need_patch) {
+
+    assert (interm_repr);
+
+    IR_TOP_CELL_ -> cmd_name = cmd_name;
+    IR_TOP_CELL_ -> cmd_type = cmd_type;
+
+    IR_TOP_CELL_ -> dest_operand_type   = dest_operand_type;  
+    IR_TOP_CELL_ -> dest_operand_value  = dest_operand_value;
+    IR_TOP_CELL_ -> dest_operand_disp   = dest_operand_disp;
+    IR_TOP_CELL_ -> is_dest_operand_mem = is_dest_operand_mem;
+
+    IR_TOP_CELL_ -> src_operand_type   = src_operand_type;
+    IR_TOP_CELL_ -> src_operand_value  = src_operand_value;
+    IR_TOP_CELL_ -> src_operand_disp   = src_operand_disp;
+    IR_TOP_CELL_ -> is_src_operand_mem = is_src_operand_mem;
+
+    IR_TOP_CELL_ -> jump_ptr   = jump_ptr;
+    IR_TOP_CELL_ -> jump_addr  = jump_addr;
+    IR_TOP_CELL_ -> need_patch = need_patch;
+
+    IR_SIZE_++;
+
+    return IR_FUNC_STATUS_OK;
+}
+
 IntReprFuncStatus TreeToIntRepr (FILE *asm_file, const Tree *lang_tree) {
 
     assert (asm_file);
@@ -567,8 +600,8 @@ IntReprFuncStatus IntReprMathExpressionWrite (FILE *asm_file, const TreeNode *cu
             return IR_FUNC_STATUS_OK;
     }
 
-    if (IntReprMathOperatorWrite (asm_file, current_node) == IR_FUNC_STATUS_FAIL)
-        return IR_FUNC_STATUS_FAIL;
+    //if (IntReprMathOperatorWrite (asm_file, current_node) == IR_FUNC_STATUS_FAIL)
+    //    return IR_FUNC_STATUS_FAIL;
 
     return IR_FUNC_STATUS_OK;
 }
@@ -630,33 +663,38 @@ IntReprFuncStatus IntReprVarOrNumWrite (FILE *asm_file, const TreeNode *current_
     return IR_FUNC_STATUS_OK;
 }
 
-IntReprFuncStatus IntReprMathOperatorWrite (FILE *asm_file, const TreeNode *current_node) {
+IntReprFuncStatus IntReprMathOperatorWrite (IntRepr *interm_repr, const TreeNode *current_node) {
 
-    assert (asm_file);
+    assert (interm_repr);
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
+
+    IR_TOP_CELL_ -> cmd_name          = "mov";
+    IR_TOP_CELL_ -> cmd_type          = IR_CMD_MOV;
+    IR_TOP_CELL_ -> dest_operand_type = IR_OP_REG_R13; 
+    IR_TOP_CELL_ -> dest_operand_type = IR_OP_REG_R13;
 
     if (NODE_TYPE == BINARY_OPERATOR || NODE_TYPE == UNARY_OPERATOR)
         switch (NODE_MATH_OPERATOR) {
 
             case OPERATOR_ADD:
-                fprintf (asm_file, "add\n");
+                //fprintf (asm_file, "add\n");
                 break;
 
             case OPERATOR_SUB:
-                fprintf (asm_file, "sub\n");
+                //fprintf (asm_file, "sub\n");
                 break;
 
             case OPERATOR_MUL:
-                fprintf (asm_file, "mul\n");
+                //fprintf (asm_file, "mul\n");
                 break;
 
             case OPERATOR_DIV:
-                fprintf (asm_file, "div\n");
+                //fprintf (asm_file, "div\n");
                 break;
 
             case OPERATOR_SQRT:
-                fprintf (asm_file, "sqrt\n");
+                //fprintf (asm_file, "sqrt\n");
                 break;
 
             default:
