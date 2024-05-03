@@ -10,6 +10,7 @@
 #include "../../lib/tree/math_tree/math_tree_func.h"
 
 #include "ast_to_ir.h"
+#include "ir_dsl.h"
 
 IntReprFuncStatus IntReprCtor (IntRepr *interm_repr) {
 
@@ -79,6 +80,9 @@ IntReprFuncStatus IntReprEmit (IntRepr *interm_repr,
                                const bool         need_patch) {
 
     assert (interm_repr);
+
+    if (IR_SIZE_ >= IR_CAPACITY_)
+        IntReprDataRecalloc (interm_repr);
 
     IR_TOP_CELL_ -> cmd_name = cmd_name;
     IR_TOP_CELL_ -> cmd_type = cmd_type;

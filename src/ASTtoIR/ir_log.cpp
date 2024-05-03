@@ -5,6 +5,7 @@
 
 #include "ast_to_ir.h"
 #include "ir_log.h"
+#include "ir_dsl.h"
 
 static FILE *IR_LOG_FILE = IntReprLogFileCreate ("IR_log.txt");
 

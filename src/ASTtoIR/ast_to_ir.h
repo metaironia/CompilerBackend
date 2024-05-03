@@ -9,14 +9,6 @@
 #include "../../lib/tree/math_tree/dsl_commands.h"
 #include "../../lib/tree/math_tree/math_tree_func.h"
 
-#define IR_CELL_                                        (interm_repr -> cell)
-
-#define IR_SIZE_                                        (interm_repr -> size)
-
-#define IR_CAPACITY_                                    (interm_repr -> capacity)
-
-#define IR_TOP_CELL_                                    (IR_CELL_ + IR_SIZE_)
-
 #define CURRENT_FUNC_NAME_NODE(current_node)            current_node -> right_branch -> left_branch
 
 #define CURRENT_FUNC_FIRST_END_LINE_NODE(current_node)  CURRENT_FUNC_NAME_NODE(current_node) -> right_branch
