@@ -34,7 +34,9 @@ enum OperandType {
     IR_OP_REG_R11,
     IR_OP_REG_R12,
     IR_OP_REG_R13,
-    IR_OP_REG_R14
+    IR_OP_REG_R14,
+    IR_OP_REG_RBP,
+    IR_OP_REG_RSP
 };
 
 enum CommandType {
@@ -116,23 +118,23 @@ IntReprFuncStatus IntReprOperatorRetWrite (FILE *asm_file, const TreeNode *curre
 
 IntReprFuncStatus IntReprOperatorWhileWrite (FILE *asm_file, const TreeNode *current_node);
 
-IntReprFuncStatus IntReprOperatorOrAndWrite (FILE *asm_file, const TreeNode *current_node);
+IntReprFuncStatus IntReprOperatorOrAndWrite (IntRepr *interm_repr, const TreeNode *current_node);
 
-IntReprFuncStatus IntReprOperatorComparisonWrite (FILE *asm_file, const TreeNode *current_node);
+IntReprFuncStatus IntReprOperatorComparisonWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp);
 
 IntReprFuncStatus IntReprConditionWrite (FILE *asm_file, const TreeNode *current_node);
 
 IntReprFuncStatus IntReprOperatorAssignWrite (FILE *asm_file, const TreeNode *current_node);
 
-IntReprFuncStatus IntReprMathExpressionWrite (FILE *asm_file, const TreeNode *current_node);
+IntReprFuncStatus IntReprMathExpressionWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp);
 
 IntReprFuncStatus IntReprFuncCallWrite (FILE *asm_file, const TreeNode *current_node);
 
 IntReprFuncStatus IntReprFuncPassedArgsWrite (FILE *asm_file, const TreeNode *current_node);
 
-IntReprFuncStatus IntReprVarOrNumWrite (FILE *asm_file, const TreeNode *current_node);
+IntReprFuncStatus IntReprVarOrNumWrite (FILE *asm_file, const TreeNode *current_node, int *mem_disp);
 
-IntReprFuncStatus IntReprMathOperatorWrite (IntRepr *interm_repr, const TreeNode *current_node);
+IntReprFuncStatus IntReprMathOperatorWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp);
 
 IntReprFuncStatus LangTreeVarsSet (Tree *lang_tree, const NameTable *lang_name_table);
 
