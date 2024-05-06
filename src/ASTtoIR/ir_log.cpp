@@ -38,7 +38,7 @@ IntReprFuncStatus IntReprDump (const IntRepr *interm_repr) {
 
     for (size_t i = 0; i < (size_t) (IR_SIZE_); i++) {
 
-        IR_LOG_PRINT_ ("cell #%zu", i);
+        IR_LOG_PRINT_ ("cell #%zu\n", i);
 
         IntReprCellDump (IR_CELL_ + i);
     }
@@ -55,7 +55,7 @@ IntReprFuncStatus IntReprCellDump (const IntReprCell *interm_repr_cell) {
     IR_LOG_PRINT_ ("    command name:                     %s\n",          interm_repr_cell -> cmd_name);
     IR_LOG_PRINT_ ("    command type:                     %d\n",          interm_repr_cell -> cmd_type);
     IR_LOG_PRINT_ ("    destination operand:              %d\n",          interm_repr_cell -> dest_operand_type);
-    IR_LOG_PRINT_ ("    destination operand value:        %" PRIx64 "\n", interm_repr_cell -> dest_operand_value);
+    IR_LOG_PRINT_ ("    destination operand value:        %lg\n",         interm_repr_cell -> dest_operand_value);
     IR_LOG_PRINT_ ("    destination operand displacement: %" PRIx64 "\n", interm_repr_cell -> dest_operand_disp);
 
     IR_LOG_PRINT_ ("    is dest operand has mem type:     ");
@@ -63,7 +63,7 @@ IntReprFuncStatus IntReprCellDump (const IntReprCell *interm_repr_cell) {
     IntReprFieldStatePrint (interm_repr_cell -> is_dest_operand_mem);
         
     IR_LOG_PRINT_ ("    source operand:                   %d\n",          interm_repr_cell -> src_operand_type);
-    IR_LOG_PRINT_ ("    source operand value:             %" PRIx64 "\n", interm_repr_cell -> src_operand_value);
+    IR_LOG_PRINT_ ("    source operand value:             %lg\n",         interm_repr_cell -> src_operand_value);
     IR_LOG_PRINT_ ("    source operand displacement:      %" PRIx64 "\n", interm_repr_cell -> src_operand_disp);
 
     IR_LOG_PRINT_ ("    is source operand has mem type:   ");
