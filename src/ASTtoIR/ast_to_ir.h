@@ -36,7 +36,12 @@ enum OperandType {
     IR_OP_REG_R13,
     IR_OP_REG_R14,
     IR_OP_REG_RBP,
-    IR_OP_REG_RSP
+    IR_OP_REG_RSP,
+    IR_OP_REG_XMM0,
+    IR_OP_REG_XMM1,
+    IR_OP_REG_XMM2,
+    IR_OP_REG_XMM3,
+    IR_OP_REG_XMM4
 };
 
 enum CommandType {
@@ -56,12 +61,12 @@ struct IntReprCell {
     CommandType  cmd_type;
 
     OperandType  dest_operand_type;  
-    int64_t      dest_operand_value;
+    double       dest_operand_value;
     int64_t      dest_operand_disp;
     bool         is_dest_operand_mem;
 
     OperandType  src_operand_type;
-    int64_t      src_operand_value;
+    double       src_operand_value;
     int64_t      src_operand_disp;
     bool         is_src_operand_mem;
 
@@ -91,9 +96,9 @@ IntReprFuncStatus IntReprDataRecalloc (IntRepr *interm_repr);
 
 IntReprFuncStatus IntReprEmit (IntRepr *interm_repr, 
                                const char        *cmd_name,          const CommandType cmd_type,
-                               const OperandType  dest_operand_type, const int64_t     dest_operand_value,
+                               const OperandType  dest_operand_type, const double      dest_operand_value,
                                const int64_t      dest_operand_disp, const bool        is_dest_operand_mem,
-                               const OperandType  src_operand_type,  const int64_t     src_operand_value,
+                               const OperandType  src_operand_type,  const double      src_operand_value,
                                const int64_t      src_operand_disp,  const bool        is_src_operand_mem,
                                      IntReprCell *jump_ptr,          const int64_t     jump_addr,
                                const bool         need_patch);
@@ -132,7 +137,7 @@ IntReprFuncStatus IntReprFuncCallWrite (FILE *asm_file, const TreeNode *current_
 
 IntReprFuncStatus IntReprFuncPassedArgsWrite (FILE *asm_file, const TreeNode *current_node);
 
-IntReprFuncStatus IntReprVarOrNumWrite (FILE *asm_file, const TreeNode *current_node, int *mem_disp);
+IntReprFuncStatus IntReprVarOrNumWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp);
 
 IntReprFuncStatus IntReprMathOperatorWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp);
 

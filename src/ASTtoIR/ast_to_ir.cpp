@@ -63,7 +63,7 @@ IntReprFuncStatus IntReprDataRecalloc (IntRepr *interm_repr) {
 
     IR_CELL_ = (IntReprCell *) realloc (IR_CELL_, all_cells_new_size);
 
-    memset (IR_CELL_, 0, all_cells_new_size - all_cells_old_size);
+    memset (IR_CELL_ + IR_CAPACITY_, 0, all_cells_new_size - all_cells_old_size);
 
     IR_CAPACITY_ *= IR_INCREASE_NUM;
 
@@ -72,9 +72,9 @@ IntReprFuncStatus IntReprDataRecalloc (IntRepr *interm_repr) {
 
 IntReprFuncStatus IntReprEmit (IntRepr *interm_repr, 
                                const char        *cmd_name,          const CommandType cmd_type,
-                               const OperandType  dest_operand_type, const int64_t     dest_operand_value,
+                               const OperandType  dest_operand_type, const double      dest_operand_value,
                                const int64_t      dest_operand_disp, const bool        is_dest_operand_mem,
-                               const OperandType  src_operand_type,  const int64_t     src_operand_value,
+                               const OperandType  src_operand_type,  const double      src_operand_value,
                                const int64_t      src_operand_disp,  const bool        is_src_operand_mem,
                                      IntReprCell *jump_ptr,          const int64_t     jump_addr,
                                const bool         need_patch) {
@@ -553,6 +553,7 @@ IntReprFuncStatus IntReprOperatorAssignWrite (FILE *asm_file, const TreeNode *cu
 IntReprFuncStatus IntReprMathExpressionWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp) {
 
     assert (interm_repr);
+    assert (mem_disp);
 
     if (!current_node)
         return IR_FUNC_STATUS_FAIL;
@@ -563,7 +564,7 @@ IntReprFuncStatus IntReprMathExpressionWrite (IntRepr *interm_repr, const TreeNo
 
         case NUMBER:
         case VARIABLE:
-            //IntReprVarOrNumWrite (interm_repr, current_node); //TODO make numorvar write
+            IntReprVarOrNumWrite (interm_repr, current_node, mem_disp);
             return IR_FUNC_STATUS_OK;
 
         case LANGUAGE_OPERATOR:
@@ -606,8 +607,8 @@ IntReprFuncStatus IntReprMathExpressionWrite (IntRepr *interm_repr, const TreeNo
             return IR_FUNC_STATUS_OK;
     }
 
-    //if (IntReprMathOperatorWrite (asm_file, current_node) == IR_FUNC_STATUS_FAIL)
-    //    return IR_FUNC_STATUS_FAIL;
+    if (IntReprMathOperatorWrite (interm_repr, current_node, mem_disp) == IR_FUNC_STATUS_FAIL)
+        return IR_FUNC_STATUS_FAIL;
 
     return IR_FUNC_STATUS_OK;
 }
@@ -654,11 +655,12 @@ IntReprFuncStatus IntReprFuncPassedArgsWrite (FILE *asm_file, const TreeNode *cu
 IntReprFuncStatus IntReprVarOrNumWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp) {
 
     assert (interm_repr);
+    assert (mem_disp);
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
 
-    if (NODE_TYPE == NUMBER);
-        //IR_EMIT_CMD_MOV_MI (IR_OP_REG_RBP, *mem_disp, NODE_VALUE); // TODO make number write
+    if (NODE_TYPE == NUMBER)
+        IR_EMIT_CMD_MOVSD_MI (IR_OP_REG_RBP, *mem_disp, NODE_VALUE);
 
     else if (NODE_TYPE == VARIABLE);
         //fprintf (asm_file, "push [rbx+%zu]\n", (size_t) NODE_VALUE); //TODO make var write
@@ -669,9 +671,10 @@ IntReprFuncStatus IntReprVarOrNumWrite (IntRepr *interm_repr, const TreeNode *cu
     return IR_FUNC_STATUS_OK;
 }
 
-IntReprFuncStatus IntReprMathOperatorWrite (IntRepr *interm_repr, const TreeNode *current_node) {
+IntReprFuncStatus IntReprMathOperatorWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp) {
 
     assert (interm_repr);
+    assert (mem_disp);
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
 
@@ -679,19 +682,19 @@ IntReprFuncStatus IntReprMathOperatorWrite (IntRepr *interm_repr, const TreeNode
         switch (NODE_MATH_OPERATOR) {
 
             case OPERATOR_ADD:
-                IR_EMIT_CMD_ADD_RR (IR_OP_REG_R10, IR_OP_REG_R11);
+                IR_EMIT_CMD_ADDSD_RR (IR_OP_REG_XMM0, IR_OP_REG_XMM1);
                 break;
 
             case OPERATOR_SUB:
-                IR_EMIT_CMD_SUB_RR (IR_OP_REG_R10, IR_OP_REG_R11);
+                IR_EMIT_CMD_SUBSD_RR (IR_OP_REG_XMM0, IR_OP_REG_XMM1);
                 break;
 
             case OPERATOR_MUL:
-                IR_EMIT_CMD_MUL_RR (IR_OP_REG_R10, IR_OP_REG_R11);
+                IR_EMIT_CMD_MULSD_RR (IR_OP_REG_XMM0, IR_OP_REG_XMM1);
                 break;
 
             case OPERATOR_DIV:
-                IR_EMIT_CMD_DIV_RR (IR_OP_REG_R10, IR_OP_REG_R11);
+                IR_EMIT_CMD_DIVSD_RR (IR_OP_REG_XMM0, IR_OP_REG_XMM1);
                 break;
 
             case OPERATOR_SQRT:
