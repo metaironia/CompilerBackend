@@ -52,7 +52,7 @@ enum TreeFuncStatus TreeDotFileDrawArrows (FILE *tree_dot_file_draw,
 enum TreeFuncStatus TreeDotFileSetColorElement (FILE *tree_dot_file_elem_for_set_color,
                                                 const TreeNode *tree_node_for_set_color);
 
-enum TreeFuncStatus TreeImageCreate (FILE *tree_dot_file);
+enum TreeFuncStatus TreeImageCreate (void);
 
 const char *ImageNameCreate (void);
 
