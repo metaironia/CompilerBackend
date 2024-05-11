@@ -17,6 +17,8 @@ const int IR_DEFAULT_CAPACITY = 1;
 
 const int IR_INCREASE_NUM = 2;
 
+const int STACK_CELL_SIZE = 8;
+
 enum IntReprFuncStatus {
 
     IR_FUNC_STATUS_OK,

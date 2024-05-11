@@ -659,11 +659,16 @@ IntReprFuncStatus IntReprVarOrNumWrite (IntRepr *interm_repr, const TreeNode *cu
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
 
-    if (NODE_TYPE == NUMBER)
-        IR_EMIT_CMD_MOVSD_MI (IR_OP_REG_RBP, *mem_disp, NODE_VALUE);
+    *mem_disp -= STACK_CELL_SIZE;
 
-    else if (NODE_TYPE == VARIABLE);
-        //fprintf (asm_file, "push [rbx+%zu]\n", (size_t) NODE_VALUE); //TODO make var write
+    if (NODE_TYPE == NUMBER)
+        IR_EMIT_CMD_MOVE_DOUBLE_MI (IR_OP_REG_RBP, *mem_disp, NODE_VALUE);
+
+    else if (NODE_TYPE == VARIABLE) {
+
+        IR_EMIT_CMD_MOVE_DOUBLE_RM (IR_OP_REG_XMM4, IR_OP_REG_RBP, (size_t) NODE_VALUE * STACK_CELL_SIZE + 2 * STACK_CELL_SIZE);
+        IR_EMIT_CMD_MOVE_DOUBLE_MR (IR_OP_REG_RBP,  *mem_disp,     IR_OP_REG_XMM4);
+    }
 
     else
         return IR_FUNC_STATUS_FAIL;
@@ -682,19 +687,19 @@ IntReprFuncStatus IntReprMathOperatorWrite (IntRepr *interm_repr, const TreeNode
         switch (NODE_MATH_OPERATOR) {
 
             case OPERATOR_ADD:
-                IR_EMIT_CMD_ADDSD_RR (IR_OP_REG_XMM0, IR_OP_REG_XMM1);
+                IR_EMIT_CMD_ADD_DOUBLE_RR (IR_OP_REG_XMM0, IR_OP_REG_XMM1);
                 break;
 
             case OPERATOR_SUB:
-                IR_EMIT_CMD_SUBSD_RR (IR_OP_REG_XMM0, IR_OP_REG_XMM1);
+                IR_EMIT_CMD_SUB_DOUBLE_RR (IR_OP_REG_XMM0, IR_OP_REG_XMM1);
                 break;
 
             case OPERATOR_MUL:
-                IR_EMIT_CMD_MULSD_RR (IR_OP_REG_XMM0, IR_OP_REG_XMM1);
+                IR_EMIT_CMD_MUL_DOUBLE_RR (IR_OP_REG_XMM0, IR_OP_REG_XMM1);
                 break;
 
             case OPERATOR_DIV:
-                IR_EMIT_CMD_DIVSD_RR (IR_OP_REG_XMM0, IR_OP_REG_XMM1);
+                IR_EMIT_CMD_DIV_DOUBLE_RR (IR_OP_REG_XMM0, IR_OP_REG_XMM1);
                 break;
 
             case OPERATOR_SQRT:
@@ -794,7 +799,7 @@ IntReprFuncStatus LangFuncVarsSet (TreeNode *current_node, const NameTable *lang
     if (NODE_TYPE == LANGUAGE_OPERATOR && NODE_LANG_OPERATOR == FUNC_CALL) {
 
         current_node = current_node -> left_branch;
-        NODE_VALUE   = (double) ((size_t) NameTableVariableFind ((size_t) NODE_VALUE, lang_name_table));    // polniy kal
+        NODE_VALUE   = (double) ((size_t) NameTableVariableFind ((size_t) NODE_VALUE, lang_name_table));
 
         LangFuncVarsSet (current_node -> left_branch, lang_name_table, local_func_name_table);
     }
