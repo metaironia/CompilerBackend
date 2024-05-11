@@ -2,12 +2,12 @@
 CC=g++
 CFLAGS= -O2
 WARNINGS=-Wshadow -Winit-self -Wcast-align -Wundef -Wfloat-equal -Winline -Wredundant-decls \
- 	 -Wunreachable-code -Wmissing-declarations -Wmissing-include-dirs -Wswitch-enum -Wswitch-default \
+ 	 -Wunreachable-code -Wmissing-declarations -Wmissing-include-dirs -Wswitch-default \
 	 -Weffc++ -Wmain -Wextra -Wall -g -pipe -fexceptions -Wcast-qual -Wconversion -Wctor-dtor-privacy \
 	 -Wempty-body -Wformat-security -Wformat=2 -Wignored-qualifiers -Wlogical-op -Wno-missing-field-initializers \
 	 -Wnon-virtual-dtor -Woverloaded-virtual -Wpointer-arith -Wsign-promo -Wstack-usage=8192 -Wstrict-aliasing \
 	 -Wstrict-null-sentinel -Wtype-limits -Wwrite-strings -Werror=vla -D_DEBUG -D_EJUDGE_CLIENT_SIDE 
-SOURCES= main.cpp ASTtoIR/ast_to_ir.cpp ASTtoIR/ir_log.cpp \
+SOURCES= main.cpp backend_input.cpp ASTtoIR/ast_to_ir.cpp ASTtoIR/ir_log.cpp \
 	 ../lib/tree/tree_func.cpp ../lib/tree/tree_log.cpp \
 	 ../lib/tree/math_tree/math_tree_func.cpp ../lib/tree/math_tree/math_operation.cpp \
        	 ../lib/oneginlib/functions_for_input.cpp \
