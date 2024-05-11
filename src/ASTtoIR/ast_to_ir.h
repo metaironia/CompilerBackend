@@ -43,7 +43,8 @@ enum OperandType {
     IR_OP_REG_XMM1,
     IR_OP_REG_XMM2,
     IR_OP_REG_XMM3,
-    IR_OP_REG_XMM4
+    IR_OP_REG_XMM4,
+    IR_OP_NO_OPERAND
 };
 
 enum CommandType {
@@ -54,7 +55,8 @@ enum CommandType {
     IR_CMD_DIV,
     IR_CMD_PUSH,
     IR_CMD_POP,
-    IR_CMD_MOV
+    IR_CMD_MOV,
+    IR_CMD_READ
 };
 
 struct IntReprCell {
@@ -115,7 +117,7 @@ IntReprFuncStatus IntReprNewFuncWrite (FILE *asm_file, const TreeNode *current_n
 
 IntReprFuncStatus IntReprLangOperatorWrite (FILE *asm_file, const TreeNode *current_node);
 
-IntReprFuncStatus IntReprOperatorReadWrite (FILE *asm_file, const TreeNode *current_node);
+IntReprFuncStatus IntReprOperatorReadWrite (IntRepr *interm_repr, const TreeNode *current_node);
 
 IntReprFuncStatus IntReprOperatorPrintWrite (FILE *asm_file, const TreeNode *current_node);
 

@@ -127,6 +127,7 @@ const char *OperandTypeNameGet (const OperandType operand_type) {
         RETURN_ENUM_NAME (IR_OP_REG_XMM2);
         RETURN_ENUM_NAME (IR_OP_REG_XMM3);
         RETURN_ENUM_NAME (IR_OP_REG_XMM4);
+        RETURN_ENUM_NAME (IR_OP_NO_OPERAND);
 
         default:
             return "UNKNOWN OPERAND TYPE";
@@ -146,6 +147,7 @@ const char *CommandTypeNameGet (const CommandType command_type) {
         RETURN_ENUM_NAME (IR_CMD_PUSH);
         RETURN_ENUM_NAME (IR_CMD_POP);
         RETURN_ENUM_NAME (IR_CMD_MOV);
+        RETURN_ENUM_NAME (IR_CMD_READ);
 
         default:
             return "UNKNOWN COMMAND TYPE";

@@ -306,23 +306,22 @@ IntReprFuncStatus IntReprLangOperatorWrite (FILE *asm_file, const TreeNode *curr
 
     return IntReprLangOperatorWrite (asm_file, end_line_node -> right_branch);
 }
+*/
+IntReprFuncStatus IntReprOperatorReadWrite (IntRepr *interm_repr, const TreeNode *current_node) {
 
-IntReprFuncStatus IntReprOperatorReadWrite (FILE *asm_file, const TreeNode *current_node) {
-
-    assert (asm_file);
+    assert (interm_repr);
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
 
     if (NODE_TYPE == LANGUAGE_OPERATOR && NODE_LANG_OPERATOR == READ) {
 
-        fprintf (asm_file, "in\n");
-
+        IR_EMIT_CMD_READ_DOUBLE (IR_OP_REG_XMM4);
         return IR_FUNC_STATUS_OK;
     }
 
     return IR_FUNC_STATUS_FAIL;
 }
-
+/*
 IntReprFuncStatus IntReprOperatorPrintWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
@@ -574,10 +573,12 @@ IntReprFuncStatus IntReprMathExpressionWrite (IntRepr *interm_repr, const TreeNo
                     IntReprFuncCallWrite (interm_repr, current_node -> left_branch);
                     return IR_FUNC_STATUS_OK;
                 //TODO func call
+                */
                 case READ:
-                    IntReprOperatorReadWrite (interm_repr, current_node, mem_disp);
+                    IntReprOperatorReadWrite   (interm_repr,   current_node);  // read value in IR_OP_REG_XMM4
+                    IR_EMIT_CMD_MOVE_DOUBLE_MR (IR_OP_REG_RBP, *mem_disp, IR_OP_REG_XMM4);
                     return IR_FUNC_STATUS_OK;
-                */ //TODO read
+
                 default:
                     return IR_FUNC_STATUS_FAIL;
             }
