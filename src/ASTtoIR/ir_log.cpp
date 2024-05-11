@@ -52,35 +52,39 @@ IntReprFuncStatus IntReprCellDump (const IntReprCell *interm_repr_cell) {
 
     assert (interm_repr_cell);
 
-    IR_LOG_PRINT_ ("    command name:                       %s\n",            interm_repr_cell -> cmd_name);
-    IR_LOG_PRINT_ ("    command type:                       %s\n",            CommandTypeNameGet (interm_repr_cell -> cmd_type));
-    IR_LOG_PRINT_ ("    destination operand:                %s\n",            OperandTypeNameGet (interm_repr_cell -> dest_operand_type));
-    IR_LOG_PRINT_ ("    destination operand value:          %lg\n",           interm_repr_cell -> dest_operand_value);
-    IR_LOG_PRINT_ ("    destination operand displacement:   0x%" PRIx64 "\n", interm_repr_cell -> dest_operand_disp);
-
-    IR_LOG_PRINT_ ("    is dest operand has mem type:       ");
+    IR_LOG_PRINT_             ("    command name:                       %s\n",  interm_repr_cell -> cmd_name);
+    IR_LOG_PRINT_             ("    command type:                       %s\n",  CommandTypeNameGet (interm_repr_cell -> cmd_type));
+    IR_LOG_PRINT_             ("    destination operand:                %s\n",  OperandTypeNameGet (interm_repr_cell -> dest_operand_type));
+    IR_LOG_PRINT_             ("    destination operand value:          %lg\n", interm_repr_cell -> dest_operand_value);
+    IR_LOG_PRINT_             ("    destination operand displacement:   ");
     
-    IntReprFieldStatePrint (interm_repr_cell -> is_dest_operand_mem);
-        
-    IR_LOG_PRINT_ ("    source operand:                     %s\n",            OperandTypeNameGet (interm_repr_cell -> src_operand_type));
-    IR_LOG_PRINT_ ("    source operand value:               %lg\n",           interm_repr_cell -> src_operand_value);
-    IR_LOG_PRINT_ ("    source operand displacement:        0x%" PRIx64 "\n", interm_repr_cell -> src_operand_disp);
+    IntReprIsFieldPoisonPrint (interm_repr_cell -> dest_operand_disp);
 
-    IR_LOG_PRINT_ ("    is source operand has mem type:     ");
-
-    IntReprFieldStatePrint (interm_repr_cell -> is_src_operand_mem);
-
-    IR_LOG_PRINT_ ("    jump ptr to IntReprCell:            %p\n",            interm_repr_cell -> jump_ptr);
-    IR_LOG_PRINT_ ("    jump addr in byte code (RIP-based): 0x%" PRIx64 "\n", interm_repr_cell -> jump_addr);
+    IR_LOG_PRINT_             ("    is dest operand has mem type:       ");
     
-    IR_LOG_PRINT_ ("    need patch:                         ");
+    IntReprFieldStatePrint    (interm_repr_cell -> is_dest_operand_mem);
+
+    IR_LOG_PRINT_             ("    source operand:                     %s\n",  OperandTypeNameGet (interm_repr_cell -> src_operand_type));
+    IR_LOG_PRINT_             ("    source operand value:               %lg\n", interm_repr_cell -> src_operand_value);
+    IR_LOG_PRINT_             ("    source operand displacement:        ");
+
+    IntReprIsFieldPoisonPrint (interm_repr_cell -> src_operand_disp);
+
+    IR_LOG_PRINT_             ("    is source operand has mem type:     ");
+
+    IntReprFieldStatePrint    (interm_repr_cell -> is_src_operand_mem);
+
+    IR_LOG_PRINT_             ("    jump ptr to IntReprCell:            %p\n",            interm_repr_cell -> jump_ptr);
+    IR_LOG_PRINT_             ("    jump addr in byte code (RIP-based): 0x%" PRIx64 "\n", interm_repr_cell -> jump_addr);
+
+    IR_LOG_PRINT_             ("    need patch:                         ");
 
     IntReprFieldStatePrint (interm_repr_cell -> need_patch);
 
     return IR_FUNC_STATUS_OK;
 }
 
-IntReprFuncStatus IntReprFieldStatePrint (bool field_status) {
+IntReprFuncStatus IntReprFieldStatePrint (const bool field_status) {
 
     if (field_status)
         IR_LOG_PRINT_ ("YES\n")
@@ -89,6 +93,17 @@ IntReprFuncStatus IntReprFieldStatePrint (bool field_status) {
         IR_LOG_PRINT_ ("NO\n");
 
     return IR_FUNC_STATUS_OK;   
+}
+
+IntReprFuncStatus IntReprIsFieldPoisonPrint (const int64_t field_value) {
+
+    if (field_value == IR_POISON)
+        IR_LOG_PRINT_ ("POISON\n")
+    
+    else
+        IR_LOG_PRINT_ ("%" PRId64 "\n", field_value);
+
+    return IR_FUNC_STATUS_OK;
 }
 
 const char *OperandTypeNameGet (const OperandType operand_type) {

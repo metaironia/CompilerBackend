@@ -21,7 +21,9 @@ IntReprFuncStatus IntReprDump (const IntRepr *interm_repr);
 
 IntReprFuncStatus IntReprCellDump (const IntReprCell *interm_repr_cell);
 
-IntReprFuncStatus IntReprFieldStatePrint (bool field_status);
+IntReprFuncStatus IntReprFieldStatePrint (const bool field_status);
+
+IntReprFuncStatus IntReprIsFieldPoisonPrint (const int64_t field_value);
 
 const char *OperandTypeNameGet (const OperandType operand_type);
 
