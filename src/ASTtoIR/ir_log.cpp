@@ -110,24 +110,9 @@ const char *OperandTypeNameGet (const OperandType operand_type) {
 
     switch (operand_type) {
 
-        RETURN_ENUM_NAME (IR_OP_IMMEDIATE);
-        RETURN_ENUM_NAME (IR_OP_REG_RAX);
-        RETURN_ENUM_NAME (IR_OP_REG_RBX);
-        RETURN_ENUM_NAME (IR_OP_REG_RCX);
-        RETURN_ENUM_NAME (IR_OP_REG_RDX);
-        RETURN_ENUM_NAME (IR_OP_REG_R10);
-        RETURN_ENUM_NAME (IR_OP_REG_R11);
-        RETURN_ENUM_NAME (IR_OP_REG_R12);
-        RETURN_ENUM_NAME (IR_OP_REG_R13);
-        RETURN_ENUM_NAME (IR_OP_REG_R14);
-        RETURN_ENUM_NAME (IR_OP_REG_RBP);
-        RETURN_ENUM_NAME (IR_OP_REG_RSP);
-        RETURN_ENUM_NAME (IR_OP_REG_XMM0);
-        RETURN_ENUM_NAME (IR_OP_REG_XMM1);
-        RETURN_ENUM_NAME (IR_OP_REG_XMM2);
-        RETURN_ENUM_NAME (IR_OP_REG_XMM3);
-        RETURN_ENUM_NAME (IR_OP_REG_XMM4);
-        RETURN_ENUM_NAME (IR_OP_NO_OPERAND);
+        #define  DEF_IR_OP(ir_op)  RETURN_ENUM_NAME (ir_op);
+        #include "ir_operands.h"
+        #undef   DEF_IR_OP
 
         default:
             return "UNKNOWN OPERAND TYPE";
@@ -140,14 +125,9 @@ const char *CommandTypeNameGet (const CommandType command_type) {
 
     switch (command_type) {
 
-        RETURN_ENUM_NAME (IR_CMD_ADD);
-        RETURN_ENUM_NAME (IR_CMD_SUB);
-        RETURN_ENUM_NAME (IR_CMD_MUL);
-        RETURN_ENUM_NAME (IR_CMD_DIV);
-        RETURN_ENUM_NAME (IR_CMD_PUSH);
-        RETURN_ENUM_NAME (IR_CMD_POP);
-        RETURN_ENUM_NAME (IR_CMD_MOV);
-        RETURN_ENUM_NAME (IR_CMD_READ);
+        #define  DEF_IR_CMD(ir_cmd)  RETURN_ENUM_NAME (ir_cmd);
+        #include "ir_commands.h"
+        #undef   DEF_IR_CMD
 
         default:
             return "UNKNOWN COMMAND TYPE";

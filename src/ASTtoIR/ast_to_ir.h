@@ -27,36 +27,16 @@ enum IntReprFuncStatus {
 
 enum OperandType {
 
-    IR_OP_IMMEDIATE,
-    IR_OP_REG_RAX,
-    IR_OP_REG_RBX,
-    IR_OP_REG_RCX,
-    IR_OP_REG_RDX,
-    IR_OP_REG_R10,
-    IR_OP_REG_R11,
-    IR_OP_REG_R12,
-    IR_OP_REG_R13,
-    IR_OP_REG_R14,
-    IR_OP_REG_RBP,
-    IR_OP_REG_RSP,
-    IR_OP_REG_XMM0,
-    IR_OP_REG_XMM1,
-    IR_OP_REG_XMM2,
-    IR_OP_REG_XMM3,
-    IR_OP_REG_XMM4,
-    IR_OP_NO_OPERAND
+    #define  DEF_IR_OP(ir_op)  ir_op,
+    #include "ir_operands.h"
+    #undef   DEF_IR_OP
 };
 
 enum CommandType {
 
-    IR_CMD_ADD,
-    IR_CMD_SUB,
-    IR_CMD_MUL,
-    IR_CMD_DIV,
-    IR_CMD_PUSH,
-    IR_CMD_POP,
-    IR_CMD_MOV,
-    IR_CMD_READ
+    #define  DEF_IR_CMD(ir_cmd)  ir_cmd,
+    #include "ir_commands.h"
+    #undef   DEF_IR_CMD
 };
 
 struct IntReprCell {
