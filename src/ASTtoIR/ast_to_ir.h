@@ -19,6 +19,8 @@ const int IR_INCREASE_NUM = 2;
 
 const int STACK_CELL_SIZE = 8;
 
+const int64_t IR_POISON = 0xFEE1DEAD; 
+
 enum IntReprFuncStatus {
 
     IR_FUNC_STATUS_OK,

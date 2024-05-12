@@ -1,10 +1,7 @@
 #ifndef IR_DSL_H
 #define IR_DSL_H
 
-#include <stdint.h>
 
-const int64_t IR_POISON = 0xFEE1DEAD; 
- 
 #define IR_CELL_                                                      (interm_repr -> cell)
 
 #define IR_SIZE_                                                      (interm_repr -> size)
@@ -27,6 +24,10 @@ const int64_t IR_POISON = 0xFEE1DEAD;
 
 #define IR_EMIT_CMD_MOVE_DOUBLE_MI(dest_reg, dest_mem_disp, imm_val)  IntReprEmit (interm_repr, "move double", IR_CMD_MOV,  dest_reg, NAN, dest_mem_disp, true,  IR_OP_IMMEDIATE,  imm_val, IR_POISON,    false, NULL, IR_POISON, false)
 
+#define IR_EMIT_CMD_MOVE_DOUBLE_RI(dest_reg, imm_val)                 IntReprEmit (interm_repr, "move double", IR_CMD_MOV,  dest_reg, NAN, IR_POISON,     false, IR_OP_IMMEDIATE,  imm_val, IR_POISON,    false, NULL, IR_POISON, false)
+
 #define IR_EMIT_CMD_READ_DOUBLE(dest_reg)                             IntReprEmit (interm_repr, "read double", IR_CMD_READ, dest_reg, NAN, IR_POISON,     false, IR_OP_NO_OPERAND, NAN,     IR_POISON,    false, NULL, IR_POISON, false)
+
+#define IR_EMIT_CMD_CMP_DOUBLE_RM(dest_reg, src_reg, src_mem_disp)    IntReprEmit (interm_repr, "cmp double",  IR_CMD_CMP,  dest_reg, NAN, IR_POISON,     false, src_reg,          NAN,     src_mem_disp, true,  NULL, IR_POISON, false)
 
 #endif
