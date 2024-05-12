@@ -417,6 +417,11 @@ IntReprFuncStatus IntReprOperatorWhileWrite (FILE *asm_file, const TreeNode *cur
 */
 IntReprFuncStatus IntReprOperatorOrAndWrite (IntRepr *interm_repr, const TreeNode *current_node) {
 
+/*
+    WARNING:
+    operators "and" and "or" are not supported now!
+*/
+
     assert (interm_repr);
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
@@ -499,16 +504,16 @@ IntReprFuncStatus IntReprOperatorComparisonWrite (IntRepr *interm_repr, const Tr
     return IR_FUNC_STATUS_OK;
 }
 
-/*
-IntReprFuncStatus IntReprConditionWrite (FILE *asm_file, const TreeNode *current_node) {
 
-    assert (asm_file);
+IntReprFuncStatus IntReprConditionWrite (IntRepr *interm_repr, const TreeNode *current_node) {
+
+    assert (interm_repr);
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
 
-    return IntReprOperatorOrAndWrite (asm_file, current_node);
+    return IntReprOperatorOrAndWrite (interm_repr, current_node);
 }
-
+/*
 IntReprFuncStatus IntReprOperatorAssignWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
