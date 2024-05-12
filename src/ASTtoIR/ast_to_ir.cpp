@@ -478,50 +478,24 @@ IntReprFuncStatus IntReprOperatorComparisonWrite (IntRepr *interm_repr, const Tr
     else
         return IR_FUNC_STATUS_FAIL;
 
+    switch (NODE_MATH_OPERATOR) {
 
-    if (NODE_TYPE == BINARY_OPERATOR)
-        switch (NODE_MATH_OPERATOR) {
+        case OPERATOR_GREATER:
+        case OPERATOR_LESS:
+        case OPERATOR_EQUAL:
+        case OPERATOR_NOT_EQUAL:
+            IR_EMIT_CMD_MOVE_DOUBLE_RM (IR_OP_REG_XMM4, IR_OP_REG_RBP, *mem_disp);
+            *mem_disp += STACK_CELL_SIZE;
+            break;
+        
+        default:
+            IR_EMIT_CMD_MOVE_DOUBLE_RI (IR_OP_REG_XMM4, 0);
+    }
 
-            case OPERATOR_GREATER:
-                //fprintf (asm_file, "jb ");
-                break;
+    IR_EMIT_CMD_CMP_DOUBLE_RM (IR_OP_REG_XMM4, IR_OP_REG_RBP, *mem_disp);
 
-            case OPERATOR_LESS:
-                //fprintf (asm_file, "ja ");
-                break;
+    *mem_disp += STACK_CELL_SIZE;
 
-            case OPERATOR_GREATER_EQ:
-                //fprintf (asm_file, "jbe ");
-                break;
-
-            case OPERATOR_LESS_EQ:
-                //fprintf (asm_file, "jae ");
-                break;
-
-            case OPERATOR_EQUAL:
-                //fprintf (asm_file, "je ");
-                break;
-
-            case OPERATOR_NOT_EQUAL:
-                //fprintf (asm_file, "jne ");
-                break;
-
-            default:
-                return IR_FUNC_STATUS_FAIL;
-        }
-
-    static size_t comparison_num = 0;
-/*
-    fprintf (asm_file, "comparison_%zu\n"
-                       "push 0\n"
-                       "jmp comparison_end_%zu\n"
-                       ":comparison_%zu\n"
-                       "push 1\n"
-                       ":comparison_end_%zu\n",
-                        comparison_num, comparison_num, comparison_num, comparison_num);
-
-    comparison_num++;
-*/
     return IR_FUNC_STATUS_OK;
 }
 
@@ -575,6 +549,7 @@ IntReprFuncStatus IntReprMathExpressionWrite (IntRepr *interm_repr, const TreeNo
                 //TODO func call
                 */
                 case READ:
+                    *mem_disp -= STACK_CELL_SIZE;
                     IntReprOperatorReadWrite   (interm_repr,   current_node);  // read value in IR_OP_REG_XMM4
                     IR_EMIT_CMD_MOVE_DOUBLE_MR (IR_OP_REG_RBP, *mem_disp, IR_OP_REG_XMM4);
                     return IR_FUNC_STATUS_OK;
@@ -683,6 +658,11 @@ IntReprFuncStatus IntReprMathOperatorWrite (IntRepr *interm_repr, const TreeNode
     assert (mem_disp);
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
+
+    IR_EMIT_CMD_MOVE_DOUBLE_RM (IR_OP_REG_XMM0, IR_OP_REG_RBP, *mem_disp + STACK_CELL_SIZE);
+    IR_EMIT_CMD_MOVE_DOUBLE_RM (IR_OP_REG_XMM1, IR_OP_REG_RBP, *mem_disp);
+
+    *mem_disp += STACK_CELL_SIZE * 2;
 
     if (NODE_TYPE == BINARY_OPERATOR || NODE_TYPE == UNARY_OPERATOR)
         switch (NODE_MATH_OPERATOR) {
