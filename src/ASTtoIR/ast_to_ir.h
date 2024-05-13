@@ -115,7 +115,7 @@ IntReprFuncStatus IntReprOperatorComparisonWrite (IntRepr *interm_repr, const Tr
 
 IntReprFuncStatus IntReprConditionWrite (IntRepr *interm_repr, const TreeNode *current_node);
 
-IntReprFuncStatus IntReprOperatorAssignWrite (FILE *asm_file, const TreeNode *current_node);
+IntReprFuncStatus IntReprOperatorAssignWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp);
 
 IntReprFuncStatus IntReprMathExpressionWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp);
 

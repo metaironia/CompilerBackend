@@ -513,21 +513,27 @@ IntReprFuncStatus IntReprConditionWrite (IntRepr *interm_repr, const TreeNode *c
 
     return IntReprOperatorOrAndWrite (interm_repr, current_node);
 }
-/*
-IntReprFuncStatus IntReprOperatorAssignWrite (FILE *asm_file, const TreeNode *current_node) {
 
-    assert (asm_file);
+IntReprFuncStatus IntReprOperatorAssignWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp) {
+
+    assert (interm_repr);
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
 
-    IntReprMathExpressionWrite (asm_file, current_node -> right_branch);
+    IntReprMathExpressionWrite (interm_repr, current_node -> right_branch, mem_disp);
 
     current_node = current_node -> left_branch;
-    fprintf (asm_file, "pop [rbx+%zu]\n", (size_t) NODE_VALUE);
+
+    const int64_t var_mem_disp = - ((int64_t) NODE_VALUE + STACK_CELL_SIZE);
+
+    IR_EMIT_CMD_MOVE_DOUBLE_RM (IR_OP_REG_XMM4, IR_OP_REG_RBP, *mem_disp);
+    IR_EMIT_CMD_MOVE_DOUBLE_MR (IR_OP_REG_RBP,  var_mem_disp,  IR_OP_REG_XMM4);
+
+    *mem_disp += STACK_CELL_SIZE;
 
     return IR_FUNC_STATUS_OK;
 }
-*/
+
 IntReprFuncStatus IntReprMathExpressionWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp) {
 
     assert (interm_repr);
