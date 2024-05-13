@@ -10,9 +10,9 @@
 
 #define IR_TOP_CELL_                                                  (IR_CELL_ + IR_SIZE_)
 
-#define IR_EMIT_CMD_ADD_DOUBLE_RR(dest_reg, src_reg)                  IntReprEmit (interm_repr, "add double",   IR_CMD_MUL,   dest_reg,         NAN, IR_POISON,     false, src_reg,          NAN,     IR_POISON,    false, NULL, IR_POISON, false)                  
+#define IR_EMIT_CMD_ADD_DOUBLE_RR(dest_reg, src_reg)                  IntReprEmit (interm_repr, "add double",   IR_CMD_ADD,   dest_reg,         NAN, IR_POISON,     false, src_reg,          NAN,     IR_POISON,    false, NULL, IR_POISON, false)                  
 
-#define IR_EMIT_CMD_SUB_DOUBLE_RR(dest_reg, src_reg)                  IntReprEmit (interm_repr, "sub double",   IR_CMD_MUL,   dest_reg,         NAN, IR_POISON,     false, src_reg,          NAN,     IR_POISON,    false, NULL, IR_POISON, false)
+#define IR_EMIT_CMD_SUB_DOUBLE_RR(dest_reg, src_reg)                  IntReprEmit (interm_repr, "sub double",   IR_CMD_SUB,   dest_reg,         NAN, IR_POISON,     false, src_reg,          NAN,     IR_POISON,    false, NULL, IR_POISON, false)
 
 #define IR_EMIT_CMD_MUL_DOUBLE_RR(dest_reg, src_reg)                  IntReprEmit (interm_repr, "mul double",   IR_CMD_MUL,   dest_reg,         NAN, IR_POISON,     false, src_reg,          NAN,     IR_POISON,    false, NULL, IR_POISON, false)
 
