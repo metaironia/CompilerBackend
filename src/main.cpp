@@ -43,7 +43,7 @@ int main (const int argc, const char *argv[]) {
 
 int mem_disp = 0; //TODO put to another file
 
-    IntReprMathExpressionWrite (&interm_repr, lang_tree.root, &mem_disp);    
+    IntReprLangOperatorWrite (&interm_repr, lang_tree.root, &mem_disp);    
     IntReprDump (&interm_repr);
 
     TreeDtor      (&lang_tree);
