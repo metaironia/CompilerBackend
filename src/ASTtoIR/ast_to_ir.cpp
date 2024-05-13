@@ -321,25 +321,29 @@ IntReprFuncStatus IntReprOperatorReadWrite (IntRepr *interm_repr, const TreeNode
 
     return IR_FUNC_STATUS_FAIL;
 }
-/*
-IntReprFuncStatus IntReprOperatorPrintWrite (FILE *asm_file, const TreeNode *current_node) {
 
-    assert (asm_file);
+IntReprFuncStatus IntReprOperatorPrintWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp) {
+
+    assert (interm_repr);
+    assert (mem_disp);
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
 
     if (NODE_TYPE == LANGUAGE_OPERATOR && NODE_LANG_OPERATOR == PRINT) {
 
-        IntReprMathExpressionWrite (asm_file, current_node -> left_branch);
+        IntReprMathExpressionWrite (interm_repr, current_node -> left_branch, mem_disp);
 
-        fprintf (asm_file, "out\n");
+        IR_EMIT_CMD_MOVE_DOUBLE_RM (IR_OP_REG_XMM4, IR_OP_REG_RBP, *mem_disp);
+        IR_EMIT_CMD_PRINT_DOUBLE   (IR_OP_REG_XMM4);
+
+        *mem_disp += STACK_CELL_SIZE;
 
         return IR_FUNC_STATUS_OK;
     }
 
     return IR_FUNC_STATUS_FAIL;
 }
-
+/*
 IntReprFuncStatus IntReprOperatorRetWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
@@ -459,6 +463,7 @@ IntReprFuncStatus IntReprOperatorOrAndWrite (IntRepr *interm_repr, const TreeNod
 IntReprFuncStatus IntReprOperatorComparisonWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp) {
 
     assert (interm_repr);
+    assert (mem_disp);
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
 
@@ -517,6 +522,7 @@ IntReprFuncStatus IntReprConditionWrite (IntRepr *interm_repr, const TreeNode *c
 IntReprFuncStatus IntReprOperatorAssignWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp) {
 
     assert (interm_repr);
+    assert (mem_disp);
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
 
@@ -653,7 +659,7 @@ IntReprFuncStatus IntReprVarOrNumWrite (IntRepr *interm_repr, const TreeNode *cu
 
     else if (NODE_TYPE == VARIABLE) {
 
-        IR_EMIT_CMD_MOVE_DOUBLE_RM (IR_OP_REG_XMM4, IR_OP_REG_RBP, (size_t) NODE_VALUE * STACK_CELL_SIZE + 2 * STACK_CELL_SIZE);
+        IR_EMIT_CMD_MOVE_DOUBLE_RM (IR_OP_REG_XMM4, IR_OP_REG_RBP, ((int64_t) NODE_VALUE) * STACK_CELL_SIZE - STACK_CELL_SIZE);
         IR_EMIT_CMD_MOVE_DOUBLE_MR (IR_OP_REG_RBP,  *mem_disp,     IR_OP_REG_XMM4);
     }
 
