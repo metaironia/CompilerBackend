@@ -248,10 +248,11 @@ IntReprFuncStatus IntReprNewFuncWrite (FILE *asm_file, const TreeNode *current_n
 
     return IR_FUNC_STATUS_FAIL;
 }
+*/
+IntReprFuncStatus IntReprLangOperatorWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp) {
 
-IntReprFuncStatus IntReprLangOperatorWrite (FILE *asm_file, const TreeNode *current_node) {
-
-    assert (asm_file);
+    assert (interm_repr);
+    assert (mem_disp);
 
     if (!current_node)
         return IR_FUNC_STATUS_OK;
@@ -261,13 +262,13 @@ IntReprFuncStatus IntReprLangOperatorWrite (FILE *asm_file, const TreeNode *curr
     if (!(NODE_TYPE == LANGUAGE_OPERATOR && NODE_LANG_OPERATOR == END_LINE))
         return IR_FUNC_STATUS_FAIL;
 
-    const TreeNode *end_line_node = current_node;
+    const  TreeNode *end_line_node = current_node;
 
     current_node = current_node -> left_branch;
 
     if (NODE_TYPE == LANGUAGE_OPERATOR)
         switch (NODE_LANG_OPERATOR) {
-
+            /*
             case IF:
                 IntReprOperatorIfWrite (asm_file, current_node);
                 break;
@@ -275,14 +276,15 @@ IntReprFuncStatus IntReprLangOperatorWrite (FILE *asm_file, const TreeNode *curr
             case WHILE:
                 IntReprOperatorWhileWrite (asm_file, current_node);
                 break;
-
+            
             case INIT:
                 current_node = current_node -> right_branch;
             //fallthrough
+            */
             case ASSIGN:
-                IntReprOperatorAssignWrite (asm_file, current_node);
+                IntReprOperatorAssignWrite (interm_repr, current_node, mem_disp);
                 break;
-
+            /*
             case FUNC_RET:
                 IntReprOperatorRetWrite (asm_file, current_node);
                 break;
@@ -291,22 +293,23 @@ IntReprFuncStatus IntReprLangOperatorWrite (FILE *asm_file, const TreeNode *curr
                 IntReprFuncCallWrite (asm_file, current_node -> left_branch);
                 fprintf (asm_file, "pop rax\n");
                 break;
-
+            */
             case PRINT:
-                IntReprOperatorPrintWrite (asm_file, current_node);
+                IntReprOperatorPrintWrite (interm_repr, current_node, mem_disp);
                 break;
 
             case READ:
-                IntReprOperatorReadWrite (asm_file, current_node);
+                IntReprOperatorReadWrite   (interm_repr,   current_node);
+                IR_EMIT_CMD_MOVE_DOUBLE_MR (IR_OP_REG_RBP, *mem_disp, IR_OP_REG_XMM4);
                 break;
 
             default:
                 return IR_FUNC_STATUS_FAIL;
         }
 
-    return IntReprLangOperatorWrite (asm_file, end_line_node -> right_branch);
+    return IntReprLangOperatorWrite (interm_repr, end_line_node -> right_branch, mem_disp);
 }
-*/
+
 IntReprFuncStatus IntReprOperatorReadWrite (IntRepr *interm_repr, const TreeNode *current_node) {
 
     assert (interm_repr);
@@ -530,7 +533,7 @@ IntReprFuncStatus IntReprOperatorAssignWrite (IntRepr *interm_repr, const TreeNo
 
     current_node = current_node -> left_branch;
 
-    const int64_t var_mem_disp = - ((int64_t) NODE_VALUE + STACK_CELL_SIZE);
+    const int64_t var_mem_disp = - ((int64_t) NODE_VALUE * STACK_CELL_SIZE + STACK_CELL_SIZE);
 
     IR_EMIT_CMD_MOVE_DOUBLE_RM (IR_OP_REG_XMM4, IR_OP_REG_RBP, *mem_disp);
     IR_EMIT_CMD_MOVE_DOUBLE_MR (IR_OP_REG_RBP,  var_mem_disp,  IR_OP_REG_XMM4);
@@ -679,7 +682,7 @@ IntReprFuncStatus IntReprMathOperatorWrite (IntRepr *interm_repr, const TreeNode
     IR_EMIT_CMD_MOVE_DOUBLE_RM (IR_OP_REG_XMM0, IR_OP_REG_RBP, *mem_disp + STACK_CELL_SIZE);
     IR_EMIT_CMD_MOVE_DOUBLE_RM (IR_OP_REG_XMM1, IR_OP_REG_RBP, *mem_disp);
 
-    *mem_disp += STACK_CELL_SIZE * 2;
+    *mem_disp += STACK_CELL_SIZE;
 
     if (NODE_TYPE == BINARY_OPERATOR || NODE_TYPE == UNARY_OPERATOR)
         switch (NODE_MATH_OPERATOR) {
@@ -710,6 +713,8 @@ IntReprFuncStatus IntReprMathOperatorWrite (IntRepr *interm_repr, const TreeNode
 
     else
         return IR_FUNC_STATUS_FAIL;
+
+    IR_EMIT_CMD_MOVE_DOUBLE_MR (IR_OP_REG_RBP, *mem_disp, IR_OP_REG_XMM0);
 
     return IR_FUNC_STATUS_OK;
 }
