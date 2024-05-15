@@ -131,27 +131,42 @@ IntReprFuncStatus IntReprBeginAndEnd (FILE *asm_file) {
 
     return IR_FUNC_STATUS_OK;
 }
+*/
+IntReprFuncStatus IntReprFuncNameWrite (IntRepr *interm_repr, const TreeNode *current_node) {
 
-IntReprFuncStatus IntReprFuncNameWrite (FILE *asm_file, const TreeNode *current_node) {
-
-    assert (asm_file);
+    assert (interm_repr);
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
 
-    fprintf (asm_file, ":");
-    fprintf (asm_file, "%s\n", (char *) ((size_t) NODE_VALUE));
-
-    fprintf (asm_file, "push rbx\n"
-                       "push rdx\n"
-                       "pop rbx\n"
-                       "push rdx\n"
-                       "push 16\n"
-                       "add\n"
-                       "pop rdx\n");   // 16 variables in func is max
+    IR_EMIT_CMD_FUNC_START (strdup ((char *) ((size_t) NODE_VALUE))); //TODO fix the mem leak
 
     return IR_FUNC_STATUS_OK;
 }
 
+IntReprFuncStatus IntReprFuncPrologueWrite (IntRepr *interm_repr, const TreeNode *current_node) {
+
+    assert (interm_repr);
+
+    MATH_TREE_NODE_VERIFY (current_node, IR);
+
+    IR_EMIT_CMD_PUSH    (IR_OP_REG_RBP);
+    IR_EMIT_CMD_MOVE_RR (IR_OP_REG_RSP, IR_OP_REG_RBP);
+
+    return IR_FUNC_STATUS_OK;
+}
+
+IntReprFuncStatus IntReprFuncEpilogueWrite (IntRepr *interm_repr, const TreeNode *current_node) {
+
+    assert (interm_repr);
+
+    MATH_TREE_NODE_VERIFY (current_node, IR);
+
+    IR_EMIT_CMD_MOVE_RM (IR_OP_REG_RBP, IR_OP_REG_RBP, 0);
+    IR_EMIT_CMD_FUNC_END_;
+
+    return IR_FUNC_STATUS_OK;
+}
+/*
 IntReprFuncStatus IntReprInitFuncArgsWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
@@ -200,16 +215,18 @@ IntReprFuncStatus IntReprInitFuncArgsWrite (FILE *asm_file, const TreeNode *curr
 
     return IR_FUNC_STATUS_FAIL;
 }
+*/
+IntReprFuncStatus IntReprNewFuncWrite (IntRepr *interm_repr, const TreeNode *current_node) {
 
-IntReprFuncStatus IntReprNewFuncWrite (FILE *asm_file, const TreeNode *current_node) {
-
-    assert (asm_file);
+    assert (interm_repr);
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
 
     if (NODE_TYPE == LANGUAGE_OPERATOR) {
 
         const TreeNode *func_node = NULL;
+              
+        int mem_disp = 0;
 
         switch (NODE_LANG_OPERATOR) {
 
@@ -225,17 +242,16 @@ IntReprFuncStatus IntReprNewFuncWrite (FILE *asm_file, const TreeNode *current_n
                 return IR_FUNC_STATUS_FAIL;
         }
 
-        IntReprFuncNameWrite     (asm_file, CURRENT_FUNC_NAME_NODE (func_node));
-        IntReprInitFuncArgsWrite (asm_file, CURRENT_FUNC_NAME_NODE (func_node) -> left_branch);
-        IntReprLangOperatorWrite (asm_file, CURRENT_FUNC_FIRST_END_LINE_NODE (func_node));
+        IntReprFuncNameWrite     (interm_repr, CURRENT_FUNC_NAME_NODE (func_node));
+        //IntReprInitFuncArgsWrite (asm_file, CURRENT_FUNC_NAME_NODE (func_node) -> left_branch); //TODO init func
+        IntReprLangOperatorWrite (interm_repr, CURRENT_FUNC_FIRST_END_LINE_NODE (func_node), &mem_disp);
 
-
-        fprintf (asm_file, "ret\n\n");      // because of Arman (declane)!!!!!
+        //TODO ret after every function
 
         switch (NODE_LANG_OPERATOR) {
 
             case NEW_FUNC:
-                IntReprNewFuncWrite (asm_file, current_node -> left_branch);
+                IntReprNewFuncWrite (interm_repr, current_node -> left_branch);
                 break;
 
             case INIT:
@@ -248,7 +264,7 @@ IntReprFuncStatus IntReprNewFuncWrite (FILE *asm_file, const TreeNode *current_n
 
     return IR_FUNC_STATUS_FAIL;
 }
-*/
+
 IntReprFuncStatus IntReprLangOperatorWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp) {
 
     assert (interm_repr);
@@ -262,7 +278,7 @@ IntReprFuncStatus IntReprLangOperatorWrite (IntRepr *interm_repr, const TreeNode
     if (!(NODE_TYPE == LANGUAGE_OPERATOR && NODE_LANG_OPERATOR == END_LINE))
         return IR_FUNC_STATUS_FAIL;
 
-    const  TreeNode *end_line_node = current_node;
+    const TreeNode *end_line_node = current_node;
 
     current_node = current_node -> left_branch;
 

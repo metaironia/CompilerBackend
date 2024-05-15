@@ -93,9 +93,9 @@ IntReprFuncStatus IntReprBeginAndEnd (FILE *asm_file);
 
 IntReprFuncStatus IntReprInitFuncArgsWrite (FILE *asm_file, const TreeNode *current_node);
 
-IntReprFuncStatus IntReprFuncNameWrite (FILE *asm_file, const TreeNode *current_func_node);
+IntReprFuncStatus IntReprFuncNameWrite (IntRepr *interm_repr, const TreeNode *current_func_node);
 
-IntReprFuncStatus IntReprNewFuncWrite (FILE *asm_file, const TreeNode *current_node);
+IntReprFuncStatus IntReprNewFuncWrite (IntRepr *interm_repr, const TreeNode *current_node);
 
 IntReprFuncStatus IntReprLangOperatorWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp);
 
