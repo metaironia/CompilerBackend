@@ -45,4 +45,7 @@
 #define IR_EMIT_CMD_FUNC_START(func_name)                             IntReprEmit (interm_repr, func_name,        IR_CMD_FUNC_START, IR_OP_NO_OPERAND, NAN, IR_POISON,     false, IR_OP_NO_OPERAND, NAN,     IR_POISON,    false, NULL, IR_POISON, false)
 
 #define IR_EMIT_CMD_FUNC_END_                                         IntReprEmit (interm_repr, "func end",       IR_CMD_FUNC_END,   IR_OP_NO_OPERAND, NAN, IR_POISON,     false, IR_OP_NO_OPERAND, NAN,     IR_POISON,    false, NULL, IR_POISON, false)
+
+#define IR_EMIT_CMD_RET_                                              IntReprEmit (interm_repr, "ret",            IR_CMD_RET,        IR_OP_NO_OPERAND, NAN, IR_POISON,     false, IR_OP_NO_OPERAND, NAN,     IR_POISON,    false, NULL, IR_POISON, false)
+
 #endif

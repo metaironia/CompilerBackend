@@ -225,7 +225,7 @@ IntReprFuncStatus IntReprNewFuncWrite (IntRepr *interm_repr, const TreeNode *cur
     if (NODE_TYPE == LANGUAGE_OPERATOR) {
 
         const TreeNode *func_node = NULL;
-              
+     
         int mem_disp = 0;
 
         switch (NODE_LANG_OPERATOR) {
@@ -246,7 +246,7 @@ IntReprFuncStatus IntReprNewFuncWrite (IntRepr *interm_repr, const TreeNode *cur
         //IntReprInitFuncArgsWrite (asm_file, CURRENT_FUNC_NAME_NODE (func_node) -> left_branch); //TODO init func
         IntReprLangOperatorWrite (interm_repr, CURRENT_FUNC_FIRST_END_LINE_NODE (func_node), &mem_disp);
 
-        //TODO ret after every function
+        IR_EMIT_CMD_RET_;
 
         switch (NODE_LANG_OPERATOR) {
 
@@ -300,11 +300,11 @@ IntReprFuncStatus IntReprLangOperatorWrite (IntRepr *interm_repr, const TreeNode
             case ASSIGN:
                 IntReprOperatorAssignWrite (interm_repr, current_node, mem_disp);
                 break;
-            /*
+            
             case FUNC_RET:
-                IntReprOperatorRetWrite (asm_file, current_node);
+                IntReprOperatorRetWrite (interm_repr, current_node, mem_disp);
                 break;
-
+            /*
             case FUNC_CALL:
                 IntReprFuncCallWrite (asm_file, current_node -> left_branch);
                 fprintf (asm_file, "pop rax\n");
@@ -362,22 +362,19 @@ IntReprFuncStatus IntReprOperatorPrintWrite (IntRepr *interm_repr, const TreeNod
 
     return IR_FUNC_STATUS_FAIL;
 }
-/*
-IntReprFuncStatus IntReprOperatorRetWrite (FILE *asm_file, const TreeNode *current_node) {
 
-    assert (asm_file);
+IntReprFuncStatus IntReprOperatorRetWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp) {
+
+    assert (interm_repr);
+    assert (mem_disp);
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
 
     if (NODE_TYPE == LANGUAGE_OPERATOR && NODE_LANG_OPERATOR == FUNC_RET) {
 
-        IntReprMathExpressionWrite (asm_file, current_node -> left_branch);
+        IntReprMathExpressionWrite (interm_repr, current_node -> left_branch, mem_disp);
 
-        fprintf (asm_file, "pop rax\n"
-                           "push rbx\n"
-                           "pop rdx\n"
-                           "pop rbx\n"
-                           "ret\n");
+        IR_EMIT_CMD_RET_;
 
         return IR_FUNC_STATUS_OK;
     }
@@ -385,7 +382,7 @@ IntReprFuncStatus IntReprOperatorRetWrite (FILE *asm_file, const TreeNode *curre
     return IR_FUNC_STATUS_FAIL;
 
 }
-
+/*
 IntReprFuncStatus IntReprOperatorIfWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
