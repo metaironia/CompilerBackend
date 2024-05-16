@@ -74,9 +74,12 @@ IntReprFuncStatus IntReprCellDump (const IntReprCell *interm_repr_cell) {
 
     IntReprFieldStatePrint    (interm_repr_cell -> is_src_operand_mem);
 
-    IR_LOG_PRINT_             ("    jump ptr to IntReprCell:            %p\n",            interm_repr_cell -> jump_ptr);
-    IR_LOG_PRINT_             ("    jump addr in byte code (RIP-based): 0x%" PRIx64 "\n", interm_repr_cell -> jump_addr);
+    IR_LOG_PRINT_             ("    jump ptr to IntReprCell:            0x%p\n", interm_repr_cell -> jump_ptr);
+    IR_LOG_PRINT_             ("    jump index in IntRepr:              ");
+    
+    IntReprIsFieldPoisonPrint (interm_repr_cell -> jump_cell_index);
 
+    IR_LOG_PRINT_             ("    jump addr in byte code (RIP-based): 0x%" PRIx64 "\n", interm_repr_cell -> jump_addr);
     IR_LOG_PRINT_             ("    need patch:                         ");
 
     IntReprFieldStatePrint (interm_repr_cell -> need_patch);

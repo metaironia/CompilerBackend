@@ -59,6 +59,7 @@ struct IntReprCell {
     bool         is_src_operand_mem;
 
     IntReprCell *jump_ptr;
+    int64_t      jump_cell_index;
     int64_t      jump_addr;
     bool         need_patch;
 };
@@ -86,8 +87,8 @@ IntReprFuncStatus IntReprEmit (IntRepr *interm_repr,
                                const int64_t      dest_operand_disp, const bool        is_dest_operand_mem,
                                const OperandType  src_operand_type,  const double      src_operand_value,
                                const int64_t      src_operand_disp,  const bool        is_src_operand_mem,
-                                     IntReprCell *jump_ptr,          const int64_t     jump_addr,
-                               const bool         need_patch);
+                                     IntReprCell *jump_ptr,          const int64_t     jump_cell_index,
+                               const int64_t     jump_addr,          const bool        need_patch);
 
 IntReprFuncStatus TreeToIntRepr (IntRepr *interm_repr, const Tree *lang_tree);
 
@@ -109,17 +110,17 @@ IntReprFuncStatus IntReprOperatorReadWrite (IntRepr *interm_repr, const TreeNode
 
 IntReprFuncStatus IntReprOperatorPrintWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp);
 
-IntReprFuncStatus IntReprOperatorIfWrite (FILE *asm_file, const TreeNode *current_node);
+IntReprFuncStatus IntReprOperatorIfWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp);
 
 IntReprFuncStatus IntReprOperatorRetWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp);
 
 IntReprFuncStatus IntReprOperatorWhileWrite (FILE *asm_file, const TreeNode *current_node);
 
-IntReprFuncStatus IntReprOperatorOrAndWrite (IntRepr *interm_repr, const TreeNode *current_node);
+IntReprFuncStatus IntReprOperatorOrAndWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp);
 
 IntReprFuncStatus IntReprOperatorComparisonWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp);
 
-IntReprFuncStatus IntReprConditionWrite (IntRepr *interm_repr, const TreeNode *current_node);
+IntReprFuncStatus IntReprConditionWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp);
 
 IntReprFuncStatus IntReprOperatorAssignWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp);
 
