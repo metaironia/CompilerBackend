@@ -68,8 +68,6 @@ struct IntRepr {
     int64_t      capacity;
 };
 
-IntReprFuncStatus TreeToIntRepr (FILE *asm_file, const Tree *lang_tree);
-
 IntReprFuncStatus IntReprCtor (IntRepr *interm_repr);
 
 IntReprFuncStatus IntReprDataCtor (IntRepr *interm_repr);
@@ -89,7 +87,9 @@ IntReprFuncStatus IntReprEmit (IntRepr *interm_repr,
                                      IntReprCell *jump_ptr,          const int64_t     jump_addr,
                                const bool         need_patch);
 
-IntReprFuncStatus IntReprBeginAndEnd (FILE *asm_file);
+IntReprFuncStatus TreeToIntRepr (IntRepr *interm_repr, const Tree *lang_tree);
+
+IntReprFuncStatus IntReprBeginAndEnd (IntRepr *interm_repr);
 
 IntReprFuncStatus IntReprInitFuncArgsWrite (FILE *asm_file, const TreeNode *current_node);
 

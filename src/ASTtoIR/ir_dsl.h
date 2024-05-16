@@ -24,7 +24,7 @@
 
 #define IR_EMIT_CMD_MOVE_RM(dest_reg, src_reg, src_mem_disp)          IntReprEmit (interm_repr, "move RM",        IR_CMD_MOV,        dest_reg,         NAN, IR_POISON,     true,  src_reg,          NAN,     src_mem_disp, false, NULL, IR_POISON, false)
 
-#define IR_EMIT_CMD_MOVE_RR(dest_reg, src_reg)                        IntReprEmit (interm_repr, "move RR",        IR_CMD_MOV,        dest_reg,         NAN, IR_POISON,     true,  src_reg,          NAN,     IR_POISON,    false, NULL, IR_POISON, false)
+#define IR_EMIT_CMD_MOVE_RR(dest_reg, src_reg)                        IntReprEmit (interm_repr, "move RR",        IR_CMD_MOV,        dest_reg,         NAN, IR_POISON,     false, src_reg,          NAN,     IR_POISON,    false, NULL, IR_POISON, false)
 
 #define IR_EMIT_CMD_MOVE_DOUBLE_MR(dest_reg, dest_mem_disp, src_reg)  IntReprEmit (interm_repr, "move double MR", IR_CMD_MOV_DOUBLE, dest_reg,         NAN, dest_mem_disp, true,  src_reg,          NAN,     IR_POISON,    false, NULL, IR_POISON, false)
 
@@ -49,5 +49,7 @@
 #define IR_EMIT_CMD_RET_                                              IntReprEmit (interm_repr, "ret",            IR_CMD_RET,        IR_OP_NO_OPERAND, NAN, IR_POISON,     false, IR_OP_NO_OPERAND, NAN,     IR_POISON,    false, NULL, IR_POISON, false)
 
 #define IR_EMIT_CMD_FUNC_CALL(func_name)                              IntReprEmit (interm_repr, func_name,        IR_CMD_FUNC_CALL,  IR_OP_NO_OPERAND, NAN, IR_POISON,     false, IR_OP_NO_OPERAND, NAN,     IR_POISON,    false, NULL, IR_POISON, false)
+
+#define IR_EMIT_CMD_EXIT_                                             IntReprEmit (interm_repr, "exit program",   IR_CMD_EXIT,       IR_OP_NO_OPERAND, NAN, IR_POISON,     false, IR_OP_NO_OPERAND, NAN,     IR_POISON,    false, NULL, IR_POISON, false)
 
 #endif

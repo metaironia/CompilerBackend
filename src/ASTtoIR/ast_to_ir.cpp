@@ -105,33 +105,29 @@ IntReprFuncStatus IntReprEmit (IntRepr *interm_repr,
 
     return IR_FUNC_STATUS_OK;
 }
-/*
-IntReprFuncStatus TreeToIntRepr (FILE *asm_file, const Tree *lang_tree) {
 
-    assert (asm_file);
+IntReprFuncStatus TreeToIntRepr (IntRepr *interm_repr, const Tree *lang_tree) {
+
+    assert (interm_repr);
     assert (lang_tree);
 
-    IntReprBeginAndEnd (asm_file);
+    IntReprBeginAndEnd (interm_repr);
 
-    IntReprNewFuncWrite (asm_file, lang_tree -> root);
+    IntReprNewFuncWrite (interm_repr, lang_tree -> root);
+
+    return IR_FUNC_STATUS_OK;
+}
+
+IntReprFuncStatus IntReprBeginAndEnd (IntRepr *interm_repr) {
+
+    assert (interm_repr);
+
+    IR_EMIT_CMD_FUNC_CALL ("main");
+    IR_EMIT_CMD_EXIT_;
 
     return IR_FUNC_STATUS_OK;
 }
 
-IntReprFuncStatus IntReprBeginAndEnd (FILE *asm_file) {
-
-    assert (asm_file);
-
-    fprintf (asm_file, "push 0\n"
-                       "push 0\n"
-                       "pop rbx\n"
-                       "pop rdx\n"
-                       "call main\n"
-                       "hlt\n\n");
-
-    return IR_FUNC_STATUS_OK;
-}
-*/
 IntReprFuncStatus IntReprFuncNameWrite (IntRepr *interm_repr, const TreeNode *current_node) {
 
     assert (interm_repr);
@@ -148,7 +144,7 @@ IntReprFuncStatus IntReprFuncPrologueWrite (IntRepr *interm_repr) {
     assert (interm_repr);
 
     IR_EMIT_CMD_PUSH    (IR_OP_REG_RBP);
-    IR_EMIT_CMD_MOVE_RR (IR_OP_REG_RSP, IR_OP_REG_RBP);
+    IR_EMIT_CMD_MOVE_RR (IR_OP_REG_RBP, IR_OP_REG_RSP);
 
     return IR_FUNC_STATUS_OK;
 }
