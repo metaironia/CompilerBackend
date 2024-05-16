@@ -19,6 +19,8 @@ const int IR_INCREASE_NUM = 2;
 
 const int STACK_CELL_SIZE = 8;
 
+const int FUNC_MAX_ARGUMENTS_AMOUNT = 32;
+
 const int64_t IR_POISON = 0xFEE1DEAD; 
 
 enum IntReprFuncStatus {
@@ -91,7 +93,7 @@ IntReprFuncStatus TreeToIntRepr (IntRepr *interm_repr, const Tree *lang_tree);
 
 IntReprFuncStatus IntReprBeginAndEnd (IntRepr *interm_repr);
 
-IntReprFuncStatus IntReprInitFuncArgsWrite (FILE *asm_file, const TreeNode *current_node);
+IntReprFuncStatus IntReprInitFuncArgsWrite (IntRepr *interm_repr, const TreeNode *current_node);
 
 IntReprFuncStatus IntReprFuncNameWrite (IntRepr *interm_repr, const TreeNode *current_func_node);
 
@@ -123,9 +125,9 @@ IntReprFuncStatus IntReprOperatorAssignWrite (IntRepr *interm_repr, const TreeNo
 
 IntReprFuncStatus IntReprMathExpressionWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp);
 
-IntReprFuncStatus IntReprFuncCallWrite (IntRepr *interm_repr, const TreeNode *current_node);
+IntReprFuncStatus IntReprFuncCallWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp);
 
-IntReprFuncStatus IntReprFuncPassedArgsWrite (FILE *asm_file, const TreeNode *current_node);
+IntReprFuncStatus IntReprFuncPassedArgsWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp);
 
 IntReprFuncStatus IntReprVarOrNumWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp);
 
