@@ -31,15 +31,15 @@ enum IntReprFuncStatus {
 
 enum OperandType {
 
-    #define  DEF_IR_OP(ir_op)  ir_op,
-    #include "ir_operands.h"
+    #define  DEF_IR_OP(ir_op, ...)  ir_op,
+    #include "../ir_operands.h"
     #undef   DEF_IR_OP
 };
 
 enum CommandType {
 
-    #define  DEF_IR_CMD(ir_cmd)  ir_cmd,
-    #include "ir_commands.h"
+    #define  DEF_IR_CMD(ir_cmd, ...)  ir_cmd,
+    #include "../ir_commands.h"
     #undef   DEF_IR_CMD
 };
 
