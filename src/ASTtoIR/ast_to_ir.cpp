@@ -76,8 +76,8 @@ IntReprFuncStatus IntReprEmit (IntRepr *interm_repr,
                                const int64_t      dest_operand_disp, const bool        is_dest_operand_mem,
                                const OperandType  src_operand_type,  const double      src_operand_value,
                                const int64_t      src_operand_disp,  const bool        is_src_operand_mem,
-                                     IntReprCell *jump_ptr,          const int64_t     jump_addr,
-                               const bool         need_patch) {
+                                     IntReprCell *jump_ptr,          const int64_t     jump_cell_index,
+                               const int64_t     jump_addr,          const bool        need_patch) {
 
     assert (interm_repr);
 
@@ -97,9 +97,10 @@ IntReprFuncStatus IntReprEmit (IntRepr *interm_repr,
     IR_TOP_CELL_ -> src_operand_disp   = src_operand_disp;
     IR_TOP_CELL_ -> is_src_operand_mem = is_src_operand_mem;
 
-    IR_TOP_CELL_ -> jump_ptr   = jump_ptr;
-    IR_TOP_CELL_ -> jump_addr  = jump_addr;
-    IR_TOP_CELL_ -> need_patch = need_patch;
+    IR_TOP_CELL_ -> jump_ptr        = jump_ptr;
+    IR_TOP_CELL_ -> jump_cell_index = jump_cell_index; 
+    IR_TOP_CELL_ -> jump_addr       = jump_addr;
+    IR_TOP_CELL_ -> need_patch      = need_patch;
 
     IR_SIZE_++;
 
@@ -280,11 +281,11 @@ IntReprFuncStatus IntReprLangOperatorWrite (IntRepr *interm_repr, const TreeNode
 
     if (NODE_TYPE == LANGUAGE_OPERATOR)
         switch (NODE_LANG_OPERATOR) {
-            /*
+            
             case IF:
-                IntReprOperatorIfWrite (asm_file, current_node);
+                IntReprOperatorIfWrite (interm_repr, current_node, mem_disp);
                 break;
-
+            /*
             case WHILE:
                 IntReprOperatorWhileWrite (asm_file, current_node);
                 break;
@@ -368,6 +369,7 @@ IntReprFuncStatus IntReprOperatorRetWrite (IntRepr *interm_repr, const TreeNode 
 
         IntReprMathExpressionWrite (interm_repr, current_node -> left_branch, mem_disp);
 
+        IR_EMIT_CMD_MOVE_DOUBLE_RM (IR_OP_REG_XMM4, IR_OP_REG_RBP, *mem_disp);
         IR_EMIT_CMD_RET_;
 
         return IR_FUNC_STATUS_OK;
@@ -376,32 +378,29 @@ IntReprFuncStatus IntReprOperatorRetWrite (IntRepr *interm_repr, const TreeNode 
     return IR_FUNC_STATUS_FAIL;
 
 }
-/*
-IntReprFuncStatus IntReprOperatorIfWrite (FILE *asm_file, const TreeNode *current_node) {
 
-    assert (asm_file);
+IntReprFuncStatus IntReprOperatorIfWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp) {
+
+    assert (interm_repr);
+    assert (mem_disp);
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
 
-    static size_t operator_if_number = 0;
-    const  size_t curr_if_number     = operator_if_number;
+    IntReprOperatorOrAndWrite (interm_repr, current_node -> left_branch, mem_disp);
 
-    operator_if_number++;
+    size_t before_if_interm_repr_size = IR_SIZE_;
 
-    IntReprOperatorOrAndWrite (asm_file, current_node -> left_branch);
-
-    fprintf (asm_file, "push 0\n"
-                       "je end_if_%zu\n", curr_if_number);
+    IR_EMIT_CMD_JUMP_EQUAL_;
 
     current_node = current_node -> right_branch;
 
-    IntReprLangOperatorWrite (asm_file, current_node);
+    IntReprLangOperatorWrite (interm_repr, current_node, mem_disp);
 
-    fprintf (asm_file, ":end_if_%zu\n", curr_if_number);
+    IR_PATCH_CMD_JUMP (before_if_interm_repr_size);
 
     return IR_FUNC_STATUS_OK;
 }
-
+/*
 IntReprFuncStatus IntReprOperatorWhileWrite (FILE *asm_file, const TreeNode *current_node) {
 
     assert (asm_file);
@@ -429,7 +428,7 @@ IntReprFuncStatus IntReprOperatorWhileWrite (FILE *asm_file, const TreeNode *cur
     return IR_FUNC_STATUS_OK;
 }
 */
-IntReprFuncStatus IntReprOperatorOrAndWrite (IntRepr *interm_repr, const TreeNode *current_node) {
+IntReprFuncStatus IntReprOperatorOrAndWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp) {
 
 /*
     WARNING:
@@ -437,20 +436,19 @@ IntReprFuncStatus IntReprOperatorOrAndWrite (IntRepr *interm_repr, const TreeNod
 */
 
     assert (interm_repr);
+    assert (mem_disp);
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
 
-    static int mem_disp = 0;
-
     if (NODE_TYPE == LANGUAGE_OPERATOR && (NODE_LANG_OPERATOR == OR || NODE_LANG_OPERATOR == AND)) {
 
-        IntReprOperatorOrAndWrite      (interm_repr, current_node -> left_branch);
+        IntReprOperatorOrAndWrite      (interm_repr, current_node -> left_branch, mem_disp);
 
-        IntReprOperatorComparisonWrite (interm_repr, current_node -> right_branch, &mem_disp);
+        IntReprOperatorComparisonWrite (interm_repr, current_node -> right_branch, mem_disp);
     }
 
     else
-        return IntReprOperatorComparisonWrite (interm_repr, current_node, &mem_disp);
+        return IntReprOperatorComparisonWrite (interm_repr, current_node, mem_disp);
 
     if (NODE_TYPE == LANGUAGE_OPERATOR)
         switch (NODE_LANG_OPERATOR) {
@@ -519,13 +517,13 @@ IntReprFuncStatus IntReprOperatorComparisonWrite (IntRepr *interm_repr, const Tr
     return IR_FUNC_STATUS_OK;
 }
 
-IntReprFuncStatus IntReprConditionWrite (IntRepr *interm_repr, const TreeNode *current_node) {
+IntReprFuncStatus IntReprConditionWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp) {
 
     assert (interm_repr);
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
 
-    return IntReprOperatorOrAndWrite (interm_repr, current_node);
+    return IntReprOperatorOrAndWrite (interm_repr, current_node, mem_disp);
 }
 
 IntReprFuncStatus IntReprOperatorAssignWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp) {
@@ -624,7 +622,9 @@ IntReprFuncStatus IntReprFuncCallWrite (IntRepr *interm_repr, const TreeNode *cu
     if (current_node -> left_branch)
         IntReprFuncPassedArgsWrite (interm_repr, current_node -> left_branch, mem_disp);
 
+    IR_EMIT_CMD_ADD_RI    (IR_OP_REG_RSP, *mem_disp - STACK_CELL_SIZE);
     IR_EMIT_CMD_FUNC_CALL ((char *) ((size_t) NODE_VALUE));
+    IR_EMIT_CMD_MOVE_RR   (IR_OP_REG_RSP, IR_OP_REG_RBP);
 
     return IR_FUNC_STATUS_OK;
 }
