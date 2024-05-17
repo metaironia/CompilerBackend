@@ -41,9 +41,7 @@ int main (const int argc, const char *argv[]) {
     IntRepr interm_repr = {};
     IntReprCtor (&interm_repr);
 
-int mem_disp = 0; //TODO put to another file
-
-    IntReprLangOperatorWrite (&interm_repr, lang_tree.root, &mem_disp);    
+    TreeToIntRepr (&interm_repr, &lang_tree);    
     IntReprDump (&interm_repr);
 
     TreeDtor      (&lang_tree);
