@@ -56,9 +56,11 @@
 
 #define IR_EMIT_CMD_JUMP_EQUAL_                                       IntReprEmit (interm_repr, "jump equal",     IR_CMD_JMP_EQUAL,  IR_OP_NO_OPERAND, NAN, IR_POISON,     false, IR_OP_NO_OPERAND, NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, true)
 
-#define IR_PATCH_CMD_JUMP(cell_index)                                 {                                                                 \
-                                                                          (IR_CELL_ + cell_index) -> jump_ptr        = IR_TOP_CELL_;    \
-                                                                          (IR_CELL_ + cell_index) -> jump_cell_index = IR_SIZE_;        \
+#define IR_EMIT_CMD_JUMP_                                             IntReprEmit (interm_repr, "jump",           IR_CMD_JMP,        IR_OP_NO_OPERAND, NAN, IR_POISON,     false, IR_OP_NO_OPERAND, NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, true)
+
+#define IR_PATCH_CMD_JUMP(cell_index_to_patch, cell_index_to_jump)    {                                                                                          \
+                                                                          (IR_CELL_ + cell_index_to_patch) -> jump_ptr        = IR_CELL_ + cell_index_to_jump;   \
+                                                                          (IR_CELL_ + cell_index_to_patch) -> jump_cell_index = cell_index_to_jump;              \
                                                                       }
 
 #endif
