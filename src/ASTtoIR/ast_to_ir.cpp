@@ -388,7 +388,7 @@ IntReprFuncStatus IntReprOperatorIfWrite (IntRepr *interm_repr, const TreeNode *
 
     IntReprOperatorOrAndWrite (interm_repr, current_node -> left_branch, mem_disp);
 
-    size_t before_if_interm_repr_size = IR_SIZE_;
+    const size_t before_if_interm_repr_size = IR_SIZE_;
 
     IR_EMIT_CMD_JUMP_EQUAL_;
 
@@ -396,38 +396,37 @@ IntReprFuncStatus IntReprOperatorIfWrite (IntRepr *interm_repr, const TreeNode *
 
     IntReprLangOperatorWrite (interm_repr, current_node, mem_disp);
 
-    IR_PATCH_CMD_JUMP (before_if_interm_repr_size);
+    IR_PATCH_CMD_JUMP (before_if_interm_repr_size, IR_SIZE_);
 
     return IR_FUNC_STATUS_OK;
 }
-/*
-IntReprFuncStatus IntReprOperatorWhileWrite (FILE *asm_file, const TreeNode *current_node) {
 
-    assert (asm_file);
+IntReprFuncStatus IntReprOperatorWhileWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp) {
+
+    assert (interm_repr);
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
 
-    static size_t operator_while_number = 0;
-    const  size_t curr_while_number     = operator_while_number;
+    const size_t before_while_interm_repr_size = IR_SIZE_;
 
-    operator_while_number++;
+    IntReprOperatorOrAndWrite (interm_repr, current_node -> left_branch, mem_disp);
 
-    fprintf (asm_file, ":while_%zu\n", curr_while_number);
+    const size_t after_cond_while_interm_repr_size = IR_SIZE_;
 
-    IntReprOperatorOrAndWrite (asm_file, current_node -> left_branch);
+    IR_EMIT_CMD_JUMP_EQUAL_;
 
-    fprintf (asm_file, "push 0\n"
-                       "je end_while_%zu\n", curr_while_number);
+    IntReprLangOperatorWrite (interm_repr, current_node -> right_branch, mem_disp);
 
-    IntReprLangOperatorWrite (asm_file, current_node -> right_branch);
+    const size_t after_body_while_interm_repr_size = IR_SIZE_;
 
-    fprintf (asm_file, "jmp while_%zu\n"
-                       ":end_while_%zu\n",
-                       curr_while_number, curr_while_number);
+    IR_EMIT_CMD_JUMP_;
+
+    IR_PATCH_CMD_JUMP (after_body_while_interm_repr_size, before_while_interm_repr_size);
+    IR_PATCH_CMD_JUMP (after_cond_while_interm_repr_size, IR_SIZE_);
 
     return IR_FUNC_STATUS_OK;
 }
-*/
+
 IntReprFuncStatus IntReprOperatorOrAndWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp) {
 
 /*
