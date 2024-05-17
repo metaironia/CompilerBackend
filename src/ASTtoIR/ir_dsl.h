@@ -10,13 +10,15 @@
 
 #define IR_TOP_CELL_                                                  (IR_CELL_ + IR_SIZE_)
 
-#define IR_EMIT_CMD_ADD_DOUBLE_RR(dest_reg, src_reg)                  IntReprEmit (interm_repr, "add double",     IR_CMD_ADD,        dest_reg,         NAN, IR_POISON,     false, src_reg,          NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, false)                  
+#define IR_EMIT_CMD_ADD_RI(dest_reg, imm_val)                         IntReprEmit (interm_repr, "add RI",         IR_CMD_ADD,        dest_reg,         NAN, IR_POISON,     false, IR_OP_IMMEDIATE,  imm_val, IR_POISON,    false, NULL, IR_POISON, IR_POISON, false)
 
-#define IR_EMIT_CMD_SUB_DOUBLE_RR(dest_reg, src_reg)                  IntReprEmit (interm_repr, "sub double",     IR_CMD_SUB,        dest_reg,         NAN, IR_POISON,     false, src_reg,          NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, false)
+#define IR_EMIT_CMD_ADD_DOUBLE_RR(dest_reg, src_reg)                  IntReprEmit (interm_repr, "add double RR",  IR_CMD_ADD_DOUBLE, dest_reg,         NAN, IR_POISON,     false, src_reg,          NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, false)                  
 
-#define IR_EMIT_CMD_MUL_DOUBLE_RR(dest_reg, src_reg)                  IntReprEmit (interm_repr, "mul double",     IR_CMD_MUL,        dest_reg,         NAN, IR_POISON,     false, src_reg,          NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, false)
+#define IR_EMIT_CMD_SUB_DOUBLE_RR(dest_reg, src_reg)                  IntReprEmit (interm_repr, "sub double RR",  IR_CMD_SUB_DOUBLE, dest_reg,         NAN, IR_POISON,     false, src_reg,          NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, false)
 
-#define IR_EMIT_CMD_DIV_DOUBLE_RR(dest_reg, src_reg)                  IntReprEmit (interm_repr, "div double",     IR_CMD_DIV,        dest_reg,         NAN, IR_POISON,     false, src_reg,          NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, false)
+#define IR_EMIT_CMD_MUL_DOUBLE_RR(dest_reg, src_reg)                  IntReprEmit (interm_repr, "mul double RR",  IR_CMD_MUL_DOUBLE, dest_reg,         NAN, IR_POISON,     false, src_reg,          NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, false)
+
+#define IR_EMIT_CMD_DIV_DOUBLE_RR(dest_reg, src_reg)                  IntReprEmit (interm_repr, "div double RR",  IR_CMD_DIV_DOUBLE, dest_reg,         NAN, IR_POISON,     false, src_reg,          NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, false)
 
 #define IR_EMIT_CMD_PUSH(src_reg)                                     IntReprEmit (interm_repr, "push",           IR_CMD_PUSH,       IR_OP_NO_OPERAND, NAN, IR_POISON,     false, src_reg,          NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, false)
 
