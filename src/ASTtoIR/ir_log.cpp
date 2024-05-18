@@ -7,6 +7,12 @@
 #include "ir_log.h"
 #include "ir_dsl.h"
 
+#define DEF_IR_OP_REG            DEF_IR_OP
+
+#define DEF_IR_OP(ir_op, ...)    RETURN_ENUM_NAME (ir_op);
+
+#define DEF_IR_CMD(ir_cmd, ...)  RETURN_ENUM_NAME (ir_cmd);
+
 static FILE *IR_LOG_FILE = IntReprLogFileCreate ("IR_log.txt");
 
 FILE *IntReprLogFileCreate (const char *log_file_name) {
@@ -113,9 +119,7 @@ const char *OperandTypeNameGet (const OperandType operand_type) {
 
     switch (operand_type) {
 
-        #define  DEF_IR_OP(ir_op, ...)  RETURN_ENUM_NAME (ir_op);
         #include "../ir_operands.h"
-        #undef   DEF_IR_OP
 
         default:
             return "UNKNOWN OPERAND TYPE";
@@ -128,9 +132,7 @@ const char *CommandTypeNameGet (const CommandType command_type) {
 
     switch (command_type) {
 
-        #define  DEF_IR_CMD(ir_cmd, ...)  RETURN_ENUM_NAME (ir_cmd);
         #include "../ir_commands.h"
-        #undef   DEF_IR_CMD
 
         default:
             return "UNKNOWN COMMAND TYPE";
