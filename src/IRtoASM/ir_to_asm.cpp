@@ -58,20 +58,18 @@ IntReprFuncStatus IntReprCmdToAsmPrint (FILE *asm_file, const IntReprCell *inter
 
     assert (interm_repr_cell);
 
-    if (interm_repr_cell -> cmd_type == IR_CMD_FUNC_START) {        // IR_CMD_FUNC_START is one specific case
-
-        fprintf (asm_file, "%s:\n", interm_repr_cell -> cmd_name);
-        return IR_FUNC_STATUS_OK;
-    }
-
     switch (interm_repr_cell -> cmd_type) {
 
         case IR_CMD_FUNC_START:
-            fprintf (asm_file, "%s:\n", interm_repr_cell -> cmd_name);
+            fprintf (asm_file, "\n%s:\n", interm_repr_cell -> cmd_name);
             return IR_FUNC_STATUS_OK;
 
         case IR_CMD_FUNC_END:
             fprintf (asm_file, "\n");
+            return IR_FUNC_STATUS_OK;
+
+        case IR_CMD_FUNC_CALL:
+            fprintf (asm_file, "call %s\n", interm_repr_cell -> cmd_name);
             return IR_FUNC_STATUS_OK;
 
         #include "../ir_commands.h"
@@ -138,7 +136,7 @@ IntReprFuncStatus IntReprOperandTypeToAsmPrint (FILE *asm_file, const IntReprOpe
     switch (interm_repr_operand -> operand_type) {
 
         case IR_OP_IMMEDIATE:
-            fprintf (asm_file, "_DOUBLE_%.3lf", interm_repr_operand -> operand_value);
+            IntReprImmValAsmLabelPrint (asm_file, interm_repr_operand -> operand_value);
             break; 
 
         case IR_OP_NO_OPERAND:
@@ -174,7 +172,7 @@ IntReprFuncStatus IntReprImmValAsmLabelPrint (FILE *asm_file, const double numbe
     if (number < 0)
         fprintf (asm_file, "neg_");
 
-    fprintf (asm_file, "%lf", number);
+    fprintf (asm_file, "%lf", fabs (number));
 
     return IR_FUNC_STATUS_OK;
 }
