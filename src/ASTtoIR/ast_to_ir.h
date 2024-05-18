@@ -43,21 +43,22 @@ enum CommandType {
     #undef   DEF_IR_CMD
 };
 
+struct IntReprOperand {
+
+    OperandType  operand_type;  
+    double       operand_value;
+    int64_t      operand_disp;
+    bool         is_operand_mem;
+};
+
 struct IntReprCell {
 
     const char  *cmd_name;
     CommandType  cmd_type;
 
-    OperandType  dest_operand_type;  
-    double       dest_operand_value;
-    int64_t      dest_operand_disp;
-    bool         is_dest_operand_mem;
-
-    OperandType  src_operand_type;
-    double       src_operand_value;
-    int64_t      src_operand_disp;
-    bool         is_src_operand_mem;
-
+    IntReprOperand dest_operand;
+    IntReprOperand src_operand;
+    
     IntReprCell *jump_ptr;
     int64_t      jump_cell_index;
     int64_t      jump_addr;

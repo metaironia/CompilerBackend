@@ -54,25 +54,25 @@ IntReprFuncStatus IntReprCellDump (const IntReprCell *interm_repr_cell) {
 
     IR_LOG_PRINT_             ("    command name:                       %s\n",  interm_repr_cell -> cmd_name);
     IR_LOG_PRINT_             ("    command type:                       %s\n",  CommandTypeNameGet (interm_repr_cell -> cmd_type));
-    IR_LOG_PRINT_             ("    destination operand:                %s\n",  OperandTypeNameGet (interm_repr_cell -> dest_operand_type));
-    IR_LOG_PRINT_             ("    destination operand value:          %lg\n", interm_repr_cell -> dest_operand_value);
+    IR_LOG_PRINT_             ("    destination operand:                %s\n",  OperandTypeNameGet ((interm_repr_cell -> dest_operand).operand_type));
+    IR_LOG_PRINT_             ("    destination operand value:          %lg\n", (interm_repr_cell -> dest_operand).operand_value);
     IR_LOG_PRINT_             ("    destination operand displacement:   ");
     
-    IntReprIsFieldPoisonPrint (interm_repr_cell -> dest_operand_disp);
+    IntReprIsFieldPoisonPrint ((interm_repr_cell -> dest_operand).operand_disp);
 
     IR_LOG_PRINT_             ("    is dest operand has mem type:       ");
     
-    IntReprFieldStatePrint    (interm_repr_cell -> is_dest_operand_mem);
+    IntReprFieldStatePrint    ((interm_repr_cell -> dest_operand).is_operand_mem);
 
-    IR_LOG_PRINT_             ("    source operand:                     %s\n",  OperandTypeNameGet (interm_repr_cell -> src_operand_type));
-    IR_LOG_PRINT_             ("    source operand value:               %lg\n", interm_repr_cell -> src_operand_value);
+    IR_LOG_PRINT_             ("    source operand:                     %s\n",  OperandTypeNameGet ((interm_repr_cell -> src_operand).operand_type));
+    IR_LOG_PRINT_             ("    source operand value:               %lg\n", (interm_repr_cell -> src_operand).operand_value);
     IR_LOG_PRINT_             ("    source operand displacement:        ");
 
-    IntReprIsFieldPoisonPrint (interm_repr_cell -> src_operand_disp);
+    IntReprIsFieldPoisonPrint ((interm_repr_cell -> src_operand).operand_disp);
 
     IR_LOG_PRINT_             ("    is source operand has mem type:     ");
 
-    IntReprFieldStatePrint    (interm_repr_cell -> is_src_operand_mem);
+    IntReprFieldStatePrint    ((interm_repr_cell -> src_operand).is_operand_mem);
 
     IR_LOG_PRINT_             ("    jump ptr to IntReprCell:            0x%p\n", interm_repr_cell -> jump_ptr);
     IR_LOG_PRINT_             ("    jump index in IntRepr:              ");
@@ -113,8 +113,8 @@ const char *OperandTypeNameGet (const OperandType operand_type) {
 
     switch (operand_type) {
 
-        #define  DEF_IR_OP(ir_op)  RETURN_ENUM_NAME (ir_op);
-        #include "ir_operands.h"
+        #define  DEF_IR_OP(ir_op, ...)  RETURN_ENUM_NAME (ir_op);
+        #include "../ir_operands.h"
         #undef   DEF_IR_OP
 
         default:
@@ -128,8 +128,8 @@ const char *CommandTypeNameGet (const CommandType command_type) {
 
     switch (command_type) {
 
-        #define  DEF_IR_CMD(ir_cmd)  RETURN_ENUM_NAME (ir_cmd);
-        #include "ir_commands.h"
+        #define  DEF_IR_CMD(ir_cmd, ...)  RETURN_ENUM_NAME (ir_cmd);
+        #include "../ir_commands.h"
         #undef   DEF_IR_CMD
 
         default:

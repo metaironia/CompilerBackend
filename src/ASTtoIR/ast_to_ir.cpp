@@ -87,15 +87,15 @@ IntReprFuncStatus IntReprEmit (IntRepr *interm_repr,
     IR_TOP_CELL_ -> cmd_name = cmd_name;
     IR_TOP_CELL_ -> cmd_type = cmd_type;
 
-    IR_TOP_CELL_ -> dest_operand_type   = dest_operand_type;  
-    IR_TOP_CELL_ -> dest_operand_value  = dest_operand_value;
-    IR_TOP_CELL_ -> dest_operand_disp   = dest_operand_disp;
-    IR_TOP_CELL_ -> is_dest_operand_mem = is_dest_operand_mem;
+    (IR_TOP_CELL_ -> dest_operand).operand_type   = dest_operand_type;  
+    (IR_TOP_CELL_ -> dest_operand).operand_value  = dest_operand_value;
+    (IR_TOP_CELL_ -> dest_operand).operand_disp   = dest_operand_disp;
+    (IR_TOP_CELL_ -> dest_operand).is_operand_mem = is_dest_operand_mem;
 
-    IR_TOP_CELL_ -> src_operand_type   = src_operand_type;
-    IR_TOP_CELL_ -> src_operand_value  = src_operand_value;
-    IR_TOP_CELL_ -> src_operand_disp   = src_operand_disp;
-    IR_TOP_CELL_ -> is_src_operand_mem = is_src_operand_mem;
+    (IR_TOP_CELL_ -> src_operand).operand_type   = src_operand_type;
+    (IR_TOP_CELL_ -> src_operand).operand_value  = src_operand_value;
+    (IR_TOP_CELL_ -> src_operand).operand_disp   = src_operand_disp;
+    (IR_TOP_CELL_ -> src_operand).is_operand_mem = is_src_operand_mem;
 
     IR_TOP_CELL_ -> jump_ptr        = jump_ptr;
     IR_TOP_CELL_ -> jump_cell_index = jump_cell_index; 
