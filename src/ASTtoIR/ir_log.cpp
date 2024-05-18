@@ -11,6 +11,8 @@
 
 #define DEF_IR_OP(ir_op, ...)    RETURN_ENUM_NAME (ir_op);
 
+#define DEF_IR_CMD_COMM          DEF_IR_CMD
+
 #define DEF_IR_CMD_FUNC          DEF_IR_CMD
 
 #define DEF_IR_CMD(ir_cmd, ...)  RETURN_ENUM_NAME (ir_cmd);

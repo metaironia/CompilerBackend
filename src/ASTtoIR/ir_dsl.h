@@ -58,6 +58,8 @@
 
 #define IR_EMIT_CMD_JUMP_                                             IntReprEmit (interm_repr, "jump",           IR_CMD_JMP,        IR_OP_NO_OPERAND, NAN, IR_POISON,     false, IR_OP_NO_OPERAND, NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, true)
 
+#define IR_EMIT_COMMENT(comment)                                      IntReprEmit (interm_repr, comment,          IR_CMD_COMMENT,    IR_OP_NO_OPERAND, NAN, IR_POISON,     false, IR_OP_NO_OPERAND, NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, false)
+
 #define IR_PATCH_CMD_JUMP(cell_index_to_patch, cell_index_to_jump)    {                                                                                          \
                                                                           (IR_CELL_ + cell_index_to_patch) -> jump_ptr        = IR_CELL_ + cell_index_to_jump;   \
                                                                           (IR_CELL_ + cell_index_to_patch) -> jump_cell_index = cell_index_to_jump;              \

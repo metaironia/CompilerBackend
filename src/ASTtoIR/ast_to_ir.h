@@ -40,11 +40,13 @@ enum OperandType {
 
 enum CommandType {
 
+    #define  DEF_IR_CMD_COMM          DEF_IR_CMD
     #define  DEF_IR_CMD_FUNC          DEF_IR_CMD
     #define  DEF_IR_CMD(ir_cmd, ...)  ir_cmd,
     #include "../ir_commands.h"
     #undef   DEF_IR_CMD
     #undef   DEF_IR_CMD_FUNC
+    #undef   DEF_IR_CMD_COMM
 };
 
 struct IntReprOperand {

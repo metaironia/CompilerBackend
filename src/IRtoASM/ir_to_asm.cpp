@@ -11,7 +11,7 @@
 
 #define DEF_IR_CMD(interm_repr_cmd, asm_cmd)    {                                       \
                                                     case interm_repr_cmd:               \
-                                                        fprintf (asm_file, asm_cmd);    \
+                                                        fprintf (asm_file, "\t" asm_cmd);    \
                                                         break;                          \
                                                 }
 
@@ -22,6 +22,8 @@
                                                 }
 
 #define DEF_IR_OP(...)   
+
+#define DEF_IR_CMD_COMM(...)
 
 #define DEF_IR_CMD_FUNC(...)
 
@@ -43,7 +45,7 @@ IntReprFuncStatus IntReprToAsmFile (const IntRepr *interm_repr, const char *outp
 
     FILE *asm_file = fopen (AsmFileNameGen (output_file_name), "w");
 
-    fprintf (asm_file, ".text\n");
+    fprintf (asm_file, "section .text\n");
 
     for (size_t i = 0; i < (size_t) IR_SIZE_; i++)
         IntReprCmdToAsmPrint (asm_file, IR_CELL_ + i);
@@ -69,7 +71,7 @@ IntReprFuncStatus IntReprCmdToAsmPrint (FILE *asm_file, const IntReprCell *inter
             return IR_FUNC_STATUS_OK;
 
         case IR_CMD_FUNC_CALL:
-            fprintf (asm_file, "call %s\n", interm_repr_cell -> cmd_name);
+            fprintf (asm_file, "\tcall %s\n", interm_repr_cell -> cmd_name);
             return IR_FUNC_STATUS_OK;
 
         #include "../ir_commands.h"
