@@ -38,11 +38,11 @@
 
 #define IR_EMIT_CMD_MOVE_DOUBLE_RR(dest_reg, src_reg)                 IntReprEmit (interm_repr, "move double RR", IR_CMD_MOV_DOUBLE, dest_reg,         NAN, IR_POISON,     false, src_reg,          NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, false)
 
-#define IR_EMIT_CMD_READ_DOUBLE(dest_reg)                             IntReprEmit (interm_repr, "read double",    IR_CMD_READ,       dest_reg,         NAN, IR_POISON,     false, IR_OP_NO_OPERAND, NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, false)
+#define IR_EMIT_CMD_READ_DOUBLE_                                      IntReprEmit (interm_repr, "read double",    IR_CMD_READ,       IR_OP_NO_OPERAND, NAN, IR_POISON,     false, IR_OP_NO_OPERAND, NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, false)
 
 #define IR_EMIT_CMD_CMP_DOUBLE_RM(dest_reg, src_reg, src_mem_disp)    IntReprEmit (interm_repr, "cmp double",     IR_CMD_CMP,        dest_reg,         NAN, IR_POISON,     false, src_reg,          NAN,     src_mem_disp, true,  NULL, IR_POISON, IR_POISON, false)
 
-#define IR_EMIT_CMD_PRINT_DOUBLE(src_reg)                             IntReprEmit (interm_repr, "print double",   IR_CMD_PRINT,      IR_OP_NO_OPERAND, NAN, IR_POISON,     false, src_reg,          NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, false)
+#define IR_EMIT_CMD_PRINT_DOUBLE_                                     IntReprEmit (interm_repr, "print double",   IR_CMD_PRINT,      IR_OP_NO_OPERAND, NAN, IR_POISON,     false, IR_OP_NO_OPERAND, NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, false)
 
 #define IR_EMIT_CMD_FUNC_START(func_name)                             IntReprEmit (interm_repr, func_name,        IR_CMD_FUNC_START, IR_OP_NO_OPERAND, NAN, IR_POISON,     false, IR_OP_NO_OPERAND, NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, false)
 

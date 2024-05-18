@@ -329,7 +329,7 @@ IntReprFuncStatus IntReprOperatorReadWrite (IntRepr *interm_repr, const TreeNode
 
     if (NODE_TYPE == LANGUAGE_OPERATOR && NODE_LANG_OPERATOR == READ) {
 
-        IR_EMIT_CMD_READ_DOUBLE (IR_OP_REG_XMM4);
+        IR_EMIT_CMD_READ_DOUBLE_; // read value located in IR_OP_REG_XMM4
         return IR_FUNC_STATUS_OK;
     }
 
@@ -348,7 +348,7 @@ IntReprFuncStatus IntReprOperatorPrintWrite (IntRepr *interm_repr, const TreeNod
         IntReprMathExpressionWrite (interm_repr, current_node -> left_branch, mem_disp);
 
         IR_EMIT_CMD_MOVE_DOUBLE_RM (IR_OP_REG_XMM4, IR_OP_REG_RBP, *mem_disp);
-        IR_EMIT_CMD_PRINT_DOUBLE   (IR_OP_REG_XMM4);
+        IR_EMIT_CMD_PRINT_DOUBLE_; // value to print located in IR_OP_REG_XMM4
 
         *mem_disp += STACK_CELL_SIZE;
 
