@@ -31,9 +31,11 @@ enum IntReprFuncStatus {
 
 enum OperandType {
 
+    #define  DEF_IR_OP_REG          DEF_IR_OP
     #define  DEF_IR_OP(ir_op, ...)  ir_op,
     #include "../ir_operands.h"
     #undef   DEF_IR_OP
+    #undef   DEF_IR_OP_REG
 };
 
 enum CommandType {
@@ -58,7 +60,7 @@ struct IntReprCell {
 
     IntReprOperand dest_operand;
     IntReprOperand src_operand;
-    
+
     IntReprCell *jump_ptr;
     int64_t      jump_cell_index;
     int64_t      jump_addr;
