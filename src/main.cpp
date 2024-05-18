@@ -15,6 +15,8 @@
 #include "ASTtoIR/ast_to_ir.h"
 #include "ASTtoIR/ir_log.h"
 
+#include "IRtoASM/ir_to_asm.h"
+
 int main (const int argc, const char *argv[]) {
 
     if (BackendCmdArgsCheck (argc) == BACKEND_FUNC_STATUS_FAIL)
@@ -41,8 +43,9 @@ int main (const int argc, const char *argv[]) {
     IntRepr interm_repr = {};
     IntReprCtor (&interm_repr);
 
-    TreeToIntRepr (&interm_repr, &lang_tree);    
-    IntReprDump (&interm_repr);
+    TreeToIntRepr    (&interm_repr, &lang_tree);    
+    IntReprDump      (&interm_repr);
+    IntReprToAsmFile (&interm_repr, OutputFileName (argv));
 
     TreeDtor      (&lang_tree);
     NameTableDtor (&lang_name_table);

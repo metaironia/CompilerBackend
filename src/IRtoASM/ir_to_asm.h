@@ -5,18 +5,20 @@
 
 #include "../ASTtoIR/ast_to_ir.h"
 
-
 const int MAX_ASM_FILE_LENGTH = 64;
-
 
 const char *AsmFileNameGen (const char *output_file_name);
 
 IntReprFuncStatus IntReprToAsmFile (const IntRepr *interm_repr, const char *output_file_name);
 
-IntReprFuncStatus IntReprCmdToAsmFile (FILE *asm_file, const IntReprCell *interm_repr_cell);
+IntReprFuncStatus IntReprCmdToAsmPrint (FILE *asm_file, const IntReprCell *interm_repr_cell);
 
-IntReprFuncStatus IntReprDestOperandToAsmFile (FILE *asm_file, const IntReprCell *interm_repr_cell);
+IntReprFuncStatus IntReprOperandToAsmPrint (FILE *asm_file, const IntReprOperand *interm_repr_operand);
 
-IntReprFuncStatus IntReprSrcOperandToAsmFile (FILE *asm_file, const IntReprCell *interm_repr_cell);
+IntReprFuncStatus IntReprOperandDispToAsmPrint (FILE *asm_file, const IntReprOperand *interm_repr_operand);
+
+IntReprFuncStatus IntReprOperandTypeToAsmPrint (FILE *asm_file, const IntReprOperand *interm_repr_operand);
+
+IntReprFuncStatus IntReprImmValAsmLabelPrint (FILE *asm_file, const double number);
 
 #endif
