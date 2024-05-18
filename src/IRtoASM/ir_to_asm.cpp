@@ -74,6 +74,10 @@ IntReprFuncStatus IntReprCmdToAsmPrint (FILE *asm_file, const IntReprCell *inter
             fprintf (asm_file, "\tcall %s\n", interm_repr_cell -> cmd_name);
             return IR_FUNC_STATUS_OK;
 
+        case IR_CMD_COMMENT:
+            fprintf (asm_file, "%s", interm_repr_cell -> cmd_name);
+            return IR_FUNC_STATUS_OK;
+
         #include "../ir_commands.h"
 
         default:
