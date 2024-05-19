@@ -71,13 +71,14 @@ IntReprFuncStatus IntReprDataRecalloc (IntRepr *interm_repr) {
 }
 
 IntReprFuncStatus IntReprEmit (IntRepr *interm_repr, 
-                               const char        *cmd_name,          const CommandType cmd_type,
-                               const OperandType  dest_operand_type, const double      dest_operand_value,
-                               const int64_t      dest_operand_disp, const bool        is_dest_operand_mem,
-                               const OperandType  src_operand_type,  const double      src_operand_value,
-                               const int64_t      src_operand_disp,  const bool        is_src_operand_mem,
-                                     IntReprCell *jump_ptr,          const int64_t     jump_cell_index,
-                               const int64_t      jump_addr,         const bool        need_patch) {
+                               const char        *cmd_name,            const CommandType cmd_type,
+                               const OperandType  dest_operand_type,   const ValueType   dest_value_type,
+                               const double       dest_operand_value,  const int64_t     dest_operand_disp,
+                               const bool         is_dest_operand_mem, const OperandType src_operand_type, 
+                               const ValueType    src_value_type,      const double      src_operand_value,
+                               const int64_t      src_operand_disp,    const bool        is_src_operand_mem,
+                                     IntReprCell *jump_ptr,            const int64_t     jump_cell_index,
+                               const int64_t      jump_addr,           const bool        need_patch) {
 
     assert (interm_repr);
 
@@ -87,15 +88,17 @@ IntReprFuncStatus IntReprEmit (IntRepr *interm_repr,
     IR_TOP_CELL_ -> cmd_name = cmd_name;
     IR_TOP_CELL_ -> cmd_type = cmd_type;
 
-    (IR_TOP_CELL_ -> dest_operand).operand_type   = dest_operand_type;  
-    (IR_TOP_CELL_ -> dest_operand).operand_value  = dest_operand_value;
-    (IR_TOP_CELL_ -> dest_operand).operand_disp   = dest_operand_disp;
-    (IR_TOP_CELL_ -> dest_operand).is_operand_mem = is_dest_operand_mem;
+    (IR_TOP_CELL_ -> dest_operand).operand_type       = dest_operand_type;  
+    (IR_TOP_CELL_ -> dest_operand).operand_value_type = dest_value_type;
+    (IR_TOP_CELL_ -> dest_operand).operand_value      = dest_operand_value;
+    (IR_TOP_CELL_ -> dest_operand).operand_disp       = dest_operand_disp;
+    (IR_TOP_CELL_ -> dest_operand).is_operand_mem     = is_dest_operand_mem;
 
-    (IR_TOP_CELL_ -> src_operand).operand_type   = src_operand_type;
-    (IR_TOP_CELL_ -> src_operand).operand_value  = src_operand_value;
-    (IR_TOP_CELL_ -> src_operand).operand_disp   = src_operand_disp;
-    (IR_TOP_CELL_ -> src_operand).is_operand_mem = is_src_operand_mem;
+    (IR_TOP_CELL_ -> src_operand).operand_type       = src_operand_type;
+    (IR_TOP_CELL_ -> src_operand).operand_value_type = src_value_type;
+    (IR_TOP_CELL_ -> src_operand).operand_value      = src_operand_value;
+    (IR_TOP_CELL_ -> src_operand).operand_disp       = src_operand_disp;
+    (IR_TOP_CELL_ -> src_operand).is_operand_mem     = is_src_operand_mem;
 
     IR_TOP_CELL_ -> jump_ptr         = jump_ptr;
     IR_TOP_CELL_ -> jump_cell_index  = jump_cell_index; 

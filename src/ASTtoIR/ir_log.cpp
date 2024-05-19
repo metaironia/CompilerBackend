@@ -67,6 +67,7 @@ IntReprFuncStatus IntReprCellDump (const IntReprCell *interm_repr_cell) {
     IR_LOG_PRINT_             ("    command name:                       %s\n",  interm_repr_cell -> cmd_name);
     IR_LOG_PRINT_             ("    command type:                       %s\n",  CommandTypeNameGet (interm_repr_cell -> cmd_type));
     IR_LOG_PRINT_             ("    destination operand:                %s\n",  OperandTypeNameGet ((interm_repr_cell -> dest_operand).operand_type));
+    IR_LOG_PRINT_             ("    destination operand value type:     %s\n",  ValueTypeNameGet   ((interm_repr_cell -> dest_operand).operand_value_type));
     IR_LOG_PRINT_             ("    destination operand value:          %lg\n", (interm_repr_cell -> dest_operand).operand_value);
     IR_LOG_PRINT_             ("    destination operand displacement:   ");
     
@@ -77,6 +78,7 @@ IntReprFuncStatus IntReprCellDump (const IntReprCell *interm_repr_cell) {
     IntReprFieldStatePrint    ((interm_repr_cell -> dest_operand).is_operand_mem);
 
     IR_LOG_PRINT_             ("    source operand:                     %s\n",  OperandTypeNameGet ((interm_repr_cell -> src_operand).operand_type));
+    IR_LOG_PRINT_             ("    source operand value type:          %s\n",  ValueTypeNameGet   ((interm_repr_cell -> src_operand).operand_value_type));
     IR_LOG_PRINT_             ("    source operand value:               %lg\n", (interm_repr_cell -> src_operand).operand_value);
     IR_LOG_PRINT_             ("    source operand displacement:        ");
 
@@ -150,4 +152,24 @@ const char *CommandTypeNameGet (const CommandType command_type) {
     }
 
     return "COMMAND TYPE GET NAME FUNCTION FAILED";
+}
+
+const char *ValueTypeNameGet (const ValueType value_type) {
+
+    switch (value_type) {
+
+        case VALUE_TYPE_DOUBLE:
+            return "VALUE_TYPE_DOUBLE";
+
+        case VALUE_TYPE_INT:
+            return "VALUE_TYPE_INT";
+
+        case NOT_A_VALUE:
+            return "NOT_A_VALUE";
+
+        default:
+            return "UNKNOWN VALUE TYPE";
+    }
+
+    return "VALUE TYPE GET NAME FUNCTION FAILED";
 }

@@ -29,4 +29,6 @@ const char *OperandTypeNameGet (const OperandType operand_type);
 
 const char *CommandTypeNameGet (const CommandType command_type);
 
+const char *ValueTypeNameGet (const ValueType value_type);
+
 #endif

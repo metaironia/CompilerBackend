@@ -51,10 +51,18 @@ enum CommandType {
     #undef   DEF_IR_CMD_JMP
 };
 
+enum ValueType {
+
+    VALUE_TYPE_INT,
+    VALUE_TYPE_DOUBLE,
+    NOT_A_VALUE
+};
+
 struct IntReprOperand {
 
     OperandType  operand_type;  
-    double       operand_value;
+    double       operand_value; //TODO fix truncated int
+    ValueType    operand_value_type;
     int64_t      operand_disp;
     bool         is_operand_mem;
 };
@@ -92,13 +100,14 @@ IntReprFuncStatus IntReprDtor (IntRepr *interm_repr);
 IntReprFuncStatus IntReprDataRecalloc (IntRepr *interm_repr);
 
 IntReprFuncStatus IntReprEmit (IntRepr *interm_repr, 
-                               const char        *cmd_name,          const CommandType cmd_type,
-                               const OperandType  dest_operand_type, const double      dest_operand_value,
-                               const int64_t      dest_operand_disp, const bool        is_dest_operand_mem,
-                               const OperandType  src_operand_type,  const double      src_operand_value,
-                               const int64_t      src_operand_disp,  const bool        is_src_operand_mem,
-                                     IntReprCell *jump_ptr,          const int64_t     jump_cell_index,
-                               const int64_t      jump_addr,         const bool        need_patch);
+                               const char        *cmd_name,            const CommandType cmd_type,
+                               const OperandType  dest_operand_type,   const ValueType   dest_value_type,
+                               const double       dest_operand_value,  const int64_t     dest_operand_disp,
+                               const bool         is_dest_operand_mem, const OperandType src_operand_type, 
+                               const ValueType    src_value_type,      const double      src_operand_value,
+                               const int64_t      src_operand_disp,    const bool        is_src_operand_mem,
+                                     IntReprCell *jump_ptr,            const int64_t     jump_cell_index,
+                               const int64_t      jump_addr,           const bool        need_patch);
 
 IntReprFuncStatus TreeToIntRepr (IntRepr *interm_repr, const Tree *lang_tree);
 
