@@ -21,4 +21,6 @@ IntReprFuncStatus IntReprOperandTypeToAsmPrint (FILE *asm_file, const IntReprOpe
 
 IntReprFuncStatus IntReprImmValAsmLabelPrint (FILE *asm_file, const double number);
 
+IntReprFuncStatus IntReprCellAsmLabelPrint (FILE *asm_file, const int64_t cell_to_jump);
+
 #endif

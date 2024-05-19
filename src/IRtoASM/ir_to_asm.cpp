@@ -9,23 +9,32 @@
 
 #include "ir_to_asm.h"
 
-#define DEF_IR_CMD(interm_repr_cmd, asm_cmd)    {                                       \
-                                                    case interm_repr_cmd:               \
-                                                        fprintf (asm_file, "\t" asm_cmd);    \
-                                                        break;                          \
-                                                }
+#define DEF_IR_CMD(interm_repr_cmd, asm_cmd)      {                                       \
+                                                      case interm_repr_cmd:               \
+                                                          fprintf (asm_file, "\t" asm_cmd);    \
+                                                          break;                          \
+                                                  }
 
-#define DEF_IR_OP_REG(interm_repr_op, op_name)  {                                       \
-                                                    case interm_repr_op:                \
-                                                        fprintf (asm_file, op_name);    \
-                                                        break;                          \
-                                                }
+#define DEF_IR_CMD_JMP(interm_repr_cmd, asm_cmd)  {                                                                                  \
+                                                      case interm_repr_cmd:                                                          \
+                                                          fprintf                  (asm_file, "\t" asm_cmd " ");                     \
+                                                          IntReprCellAsmLabelPrint (asm_file, interm_repr_cell -> jump_cell_index);  \
+                                                          fprintf                  (asm_file, "\n");                                 \
+                                                          return IR_FUNC_STATUS_OK;                                                  \
+                                                  }
+
+#define DEF_IR_OP_REG(interm_repr_op, op_name)    {                                       \
+                                                      case interm_repr_op:                \
+                                                          fprintf (asm_file, op_name);    \
+                                                          break;                          \
+                                                  }
 
 #define DEF_IR_OP(...)   
 
 #define DEF_IR_CMD_COMM(...)
 
 #define DEF_IR_CMD_FUNC(...)
+
 
 const char *AsmFileNameGen (const char *output_file_name) {
 
@@ -47,8 +56,16 @@ IntReprFuncStatus IntReprToAsmFile (const IntRepr *interm_repr, const char *outp
 
     fprintf (asm_file, "section .text\n");
 
-    for (size_t i = 0; i < (size_t) IR_SIZE_; i++)
+    for (size_t i = 0; i < (size_t) IR_SIZE_; i++) {
+
+        if ((IR_CELL_ + i) -> is_jumpable_here) {
+
+            IntReprCellAsmLabelPrint (asm_file, i);
+            fprintf                  (asm_file, ":\n");
+        }
+
         IntReprCmdToAsmPrint (asm_file, IR_CELL_ + i);
+    }
 
     fclose (asm_file);
     asm_file = NULL;
@@ -178,7 +195,16 @@ IntReprFuncStatus IntReprImmValAsmLabelPrint (FILE *asm_file, const double numbe
     if (number < 0)
         fprintf (asm_file, "neg_");
 
-    fprintf (asm_file, "%lf", fabs (number));
+    fprintf (asm_file, "%lf[rip]", fabs (number));
+
+    return IR_FUNC_STATUS_OK;
+}
+
+IntReprFuncStatus IntReprCellAsmLabelPrint (FILE *asm_file, const int64_t cell_to_jump) {
+
+    assert (asm_file);
+
+    fprintf (asm_file, ".L%" PRId64, cell_to_jump);
 
     return IR_FUNC_STATUS_OK;
 }
