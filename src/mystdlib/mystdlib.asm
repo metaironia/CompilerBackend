@@ -2,14 +2,17 @@
 
 extern GetStdHandle  ; kernel32.dll
 extern WriteConsoleA ; kernel32.dll
+extern ReadConsoleA  ; kernel32.dll
 
 global _MyPrint
+global _MyRead
 
 section .text
 
 PRINT_BUFFER_CAPACITY equ 4d
 INT_BUFFER_CAPACITY   equ 20d
 PRINT_PRECISION       equ 1000d
+ENTER_SYMBOL          equ 0Dh
 
 ;------------------------------------------------
 ; _MyPrint (prints double number to 3 decimal places)
@@ -18,64 +21,53 @@ PRINT_PRECISION       equ 1000d
 ; Destructs: rax
 ;------------------------------------------------
 
-_MyPrint:   movsd xmm6, xmm4                 ; xmm6 is non-volatile register
-
-            push rbx                         ; 
-            push rdi                         ; saving non-volatile registers MyPrintf destructs
-            push rsi                         ; 
-
-            mov rcx, -11                     ; STD_OUTPUT_HANDLE = -11
-            call GetStdHandle                ; stdout = GetStdHandle (-11)           
-
-            mov rdi, rax                     ; rdi = stdout
-            lea rsi, [rel print_buffer]      ; rsi = addr to buffer
-            xor r10, r10                     ; size of printbuffer = 0 
-
-            roundsd xmm7, xmm6, 0b1011       ; xmm7 = round toward zero
-
-            cvtsd2si rbx, xmm7
-            call _PrintDec                   ; prints integer part of number
-
-            mov al, '.'                 
-            call _BufferCharAdd              ; add decimal dot to buffer
-
-            subsd xmm6, xmm7
-
-            mov rax, PRINT_PRECISION
-            cvtsi2sd xmm7, rax               ; xmm7 = PRINT_PRECISION
-
-            mulsd xmm6, xmm7                 ; xmm6 = 3 decimals digits of number
-            cvtsd2si rbx, xmm6               ; rbx = 3-digit number
-
-            mov eax, ebx
-            call _AbsVal
-            mov ebx, eax                     ; abs (ebx)         
-
-            call _PrintDec                   ; prints 3 decimal digits
-
-            test r10, r10                    ; if buffer size is 0
-            je _EndPrint
-
-            call _CmdFlush                   ; calling cmd flush if the buffer is not empty   
-
-_EndPrint:  pop rsi                          ; 
-            pop rdi                          ; popping non-volatile registers    
-            pop rbx                          ;
-
-            ret
+_MyPrint:       movsd xmm6, xmm4                 ; xmm6 is non-volatile register
+    
+                mov rcx, -11                     ; STD_OUTPUT_HANDLE = -11
+                call GetStdHandle                ; stdout = GetStdHandle (-11)           
+    
+                mov rdi, rax                     ; rdi = stdout
+                lea rsi, [rel print_buffer]      ; rsi = addr to buffer
+                xor r10, r10                     ; size of printbuffer = 0 
+    
+                roundsd xmm7, xmm6, 0b1011       ; xmm7 = round toward zero
+    
+                cvtsd2si rbx, xmm7
+                call _PrintDec                   ; prints integer part of number
+    
+                mov al, '.'                 
+                call _BufferCharAdd              ; add decimal dot to buffer
+    
+                subsd xmm6, xmm7
+    
+                mov rax, PRINT_PRECISION
+                cvtsi2sd xmm7, rax               ; xmm7 = PRINT_PRECISION
+    
+                mulsd xmm6, xmm7                 ; xmm6 = 3 decimals digits of number
+                cvtsd2si rbx, xmm6               ; rbx = 3-digit number
+    
+                mov eax, ebx
+                call _AbsVal
+                mov ebx, eax                     ; abs (ebx)         
+    
+                call _PrintDec                   ; prints 3 decimal digits
+    
+                test r10, r10                    ; if buffer size is 0
+                je _EndPrint
+    
+                call _CmdFlush                   ; calling cmd flush if the buffer is not empty   
+  
+_EndPrint:      ret
 
 ;------------------------------------------------
 ; _PrintDec (prints decimal number)
 ; Entry: rbx = number to decimal print
 ; Return: -
-; Destructs: rax, rcx
+; Destructs: rax, rcx, rdx
 ; Note: number should be 32-bit
 ;------------------------------------------------
 
-_PrintDec:      push rdx                    ; saving rdx because div destructs it
-                push rcx                    ; saving rcx
-
-                mov eax, ebx                ; eax = number to dec print
+_PrintDec:      mov eax, ebx                ; eax = number to dec print
 
                 rol ebx, 1d                 ; sign bit is least bit now
                 and bl, 1h                  ; bl = 1 if signed
@@ -117,9 +109,6 @@ _PrintBufFill:  mov al, [rbx]
 
                 loop _PrintBufFill
 
-                pop rcx                     ; popping rcx
-                pop rdx                     ; popping rdx
-
                 ret
                 
 ;------------------------------------------------
@@ -138,9 +127,9 @@ _BufferCharAdd: mov [rsi], al                    ; filling buffer
                 cmp r10, PRINT_BUFFER_CAPACITY                        
                 jne _NoFlush
 
-                push rcx                         ; saving rest str length
+                push rcx                         ; saving symbol counter
                 call _CmdFlush
-                pop rcx                          ; popping rest str length
+                pop rcx                          ; popping symbol counter
 
 _NoFlush:       ret
 
@@ -148,7 +137,7 @@ _NoFlush:       ret
 ; _CmdFlush (prints buffer to cmd)
 ; Entry: rdi = stdout 
 ; Return: printed buffer 
-; Destructs: rcx, rdx, r8, r9
+; Destructs: rdx, r8, r9
 ;------------------------------------------------
 
 _CmdFlush:      mov rcx, rdi                     ; rcx = stdout
@@ -172,23 +161,126 @@ _CmdFlush:      mov rcx, rdi                     ; rcx = stdout
 ; Destructs: ecx
 ;------------------------------------------------
 
-_AbsVal:    mov ecx, eax                     ; ecx = number
+_AbsVal:        mov ecx, eax                     ; ecx = number
 
-            rol ecx, 1d                      ; sign bit is least bit now
-            and cl, 1h                       ; al = 1 if signed
+                rol ecx, 1d                      ; sign bit is least bit now
+                and cl, 1h                       ; al = 1 if signed
 
-            test cl, cl                      ; al = sign of num
-            je _AbsEnd
-            
-            not eax                          ;
-            inc eax                          ; abs of signed num         
+                test cl, cl                      ; al = sign of num
+                je _AbsEnd
 
-_AbsEnd:    ret
+                not eax                          ;
+                inc eax                          ; abs of signed num         
+
+_AbsEnd:        ret
+
+;------------------------------------------------
+; _MyRead (read double value)
+; Entry: -
+; Return: read value in xmm4
+;------------------------------------------------
+
+_MyRead:        xorpd xmm6, xmm6  
+                xorpd xmm7, xmm7
+
+                mov rax, __float64__(10.0)
+                movq xmm8, rax                   ; xmm8 = 10
+
+                mov rax, __float64__(1.0)
+                movq xmm9, rax                   ; xmm9 = current div multiplier
+
+                mov rcx, -10                     ; STD_INPUT_HANDLE = -10
+                call GetStdHandle                ; stdin = GetStdHandle (-10)           
+    
+                mov rdi, rax                     ; rdi = stdin
+
+                call _CharRead                   ; very first character 
+
+                xor rax, rax
+                mov al, byte [rel read_char]     ; rax = read symbol
+                
+                cmp al, '-'
+                jne _PosNumberRead          ; finish reading if enter was read
+
+                mov rax, __float64__(-1.0)
+                movq xmm10, rax                  ; xmm10 = -1
+
+                jmp _IntPartRead
+
+_PosNumberRead: sub rax, '0'                     ; rax = digit from 0 to 9 
+                cvtsi2sd xmm7, rax               ; xmm7 = current digit
+
+                mulsd xmm6, xmm8                 ; xmm6 = xmm6 * 10
+                addsd xmm6, xmm7                 ; xmm6 = current number
+
+                mov rax, __float64__(1.0)
+                movq xmm10, rax                  ; xmm10 = 1
+
+_IntPartRead:   call _CharRead
+
+                xor rax, rax
+                mov al, byte [rel read_char]     ; rax = read symbol
+                
+                cmp al, ENTER_SYMBOL
+                je _MyReadEnd                    ; finish reading if enter was read
+
+                cmp al, '.'
+                je _DecPartRead                  ; if read symbol == '.'
+
+                sub rax, '0'                     ; rax = digit from 0 to 9 
+                cvtsi2sd xmm7, rax               ; xmm7 = current digit
+
+                mulsd xmm6, xmm8                 ; xmm6 = xmm6 * 10
+                addsd xmm6, xmm7                 ; xmm6 = current number
+
+                jmp _IntPartRead
+
+_DecPartRead:   call _CharRead 
+
+                xor rax, rax
+                mov al, byte [rel read_char]     ; rax = read symbol
+
+                cmp al, ENTER_SYMBOL
+                je _MyReadEnd                    ; finish reading if enter was read
+
+                sub rax, '0'                     ; rax = digit from 0 to 9 
+                cvtsi2sd xmm7, rax               ; xmm7 = current digit
+
+                mulsd xmm9, xmm8                 ; current div multiplier *= 10
+                divsd xmm7, xmm9                 ; xmm7 = xmm7 / 10
+                addsd xmm6, xmm7                 ; xmm6 = current number
+
+                jmp _DecPartRead
+
+_MyReadEnd:     mulsd xmm6, xmm10
+                movsd xmm4, xmm6                   ; xmm4 = read number
+                
+                ret
+           
+;------------------------------------------------
+; _CharRead (reads one char)
+; Entry: rdi = stdin
+; Return: -
+;------------------------------------------------
+
+_CharRead:      mov rcx, rdi                     ; rcx = stdin
+                mov rdx, read_char               ; rdx = read_char addr
+                mov r8, 1                        ; r8 = 1 char to read
+                mov r9, number_of_read_chars     ; r9 = number of read chars 
+                push qword 0                     ; reserved  
+                
+                call ReadConsoleA                ; ReadConsole (stdin, read_char, 1, number_of_read_chars, NULL)
+                add rsp, 8                       ; clears the arguments stored in stack 
+                
+                ret
+                
 
 ; _MyExit:
-; _MyRead:
 
 section .data
+
+read_char                                db 0
+number_of_read_chars                     dw 0
 
                                          db "PRINT<<<"          ; buffer start
 print_buffer times PRINT_BUFFER_CAPACITY db 0
