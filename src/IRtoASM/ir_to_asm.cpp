@@ -159,7 +159,7 @@ IntReprFuncStatus IntReprOperandTypeToAsmPrint (FILE *asm_file, const IntReprOpe
     switch (interm_repr_operand -> operand_type) {
 
         case IR_OP_IMMEDIATE:
-            IntReprImmValAsmLabelPrint (asm_file, interm_repr_operand -> operand_value);
+            IntReprImmValToAsmPrint (asm_file, interm_repr_operand);
             break; 
 
         case IR_OP_NO_OPERAND:
@@ -188,6 +188,33 @@ uint64_t DoubleToHexCast (const double double_to_cast) {
 
 }
 */
+
+IntReprFuncStatus IntReprImmValToAsmPrint (FILE *asm_file, const IntReprOperand *interm_repr_operand) {
+
+    assert (asm_file);
+
+    switch (interm_repr_operand -> operand_value_type) {
+
+        case VALUE_TYPE_INT:
+            fprintf (asm_file, "%" PRId64, (int64_t) (interm_repr_operand -> operand_value));
+            break;
+
+        case VALUE_TYPE_DOUBLE:
+            IntReprImmValAsmLabelPrint (asm_file, interm_repr_operand -> operand_value);
+            break;
+        
+        case NOT_A_VALUE:
+            fprintf (stderr, "ATTEMPT TO PRINT NOT A VALUE TO ASM\n");
+            return IR_FUNC_STATUS_FAIL;
+
+        default:
+            fprintf (stderr, "UNKNOWN VALUE TYPE TO PRINT TO ASM\n");
+            return IR_FUNC_STATUS_FAIL;
+    }
+
+    return IR_FUNC_STATUS_OK;
+}
+
 IntReprFuncStatus IntReprImmValAsmLabelPrint (FILE *asm_file, const double number) {
 
     fprintf (asm_file, "_DOUBLE_");
