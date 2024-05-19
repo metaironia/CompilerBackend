@@ -98,8 +98,7 @@ IntReprFuncStatus IntReprEmit (IntRepr *interm_repr,
                                const OperandType  src_operand_type,  const double      src_operand_value,
                                const int64_t      src_operand_disp,  const bool        is_src_operand_mem,
                                      IntReprCell *jump_ptr,          const int64_t     jump_cell_index,
-                               const int64_t      jump_addr,         const bool        is_jumpable_here,
-                               const bool         need_patch);
+                               const int64_t      jump_addr,         const bool        need_patch);
 
 IntReprFuncStatus TreeToIntRepr (IntRepr *interm_repr, const Tree *lang_tree);
 
