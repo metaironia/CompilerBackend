@@ -92,6 +92,11 @@ IntReprFuncStatus IntReprCellDump (const IntReprCell *interm_repr_cell) {
     IntReprIsFieldPoisonPrint (interm_repr_cell -> jump_cell_index);
 
     IR_LOG_PRINT_             ("    jump addr in byte code (RIP-based): 0x%" PRIx64 "\n", interm_repr_cell -> jump_addr);
+    
+    IR_LOG_PRINT_             ("    is jumpable here:                   ");
+
+    IntReprFieldStatePrint    (interm_repr_cell -> is_jumpable_here);
+    
     IR_LOG_PRINT_             ("    need patch:                         ");
 
     IntReprFieldStatePrint (interm_repr_cell -> need_patch);
