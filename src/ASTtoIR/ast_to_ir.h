@@ -41,12 +41,14 @@ enum OperandType {
 enum CommandType {
 
     #define  DEF_IR_CMD_COMM          DEF_IR_CMD
+    #define  DEF_IR_CMD_JMP           DEF_IR_CMD
     #define  DEF_IR_CMD_FUNC          DEF_IR_CMD
     #define  DEF_IR_CMD(ir_cmd, ...)  ir_cmd,
     #include "../ir_commands.h"
     #undef   DEF_IR_CMD
     #undef   DEF_IR_CMD_FUNC
     #undef   DEF_IR_CMD_COMM
+    #undef   DEF_IR_CMD_JMP
 };
 
 struct IntReprOperand {
@@ -68,6 +70,7 @@ struct IntReprCell {
     IntReprCell *jump_ptr;
     int64_t      jump_cell_index;
     int64_t      jump_addr;
+    bool         is_jumpable_here;
     bool         need_patch;
 };
 
@@ -95,7 +98,8 @@ IntReprFuncStatus IntReprEmit (IntRepr *interm_repr,
                                const OperandType  src_operand_type,  const double      src_operand_value,
                                const int64_t      src_operand_disp,  const bool        is_src_operand_mem,
                                      IntReprCell *jump_ptr,          const int64_t     jump_cell_index,
-                               const int64_t     jump_addr,          const bool        need_patch);
+                               const int64_t      jump_addr,         const bool        is_jumpable_here,
+                               const bool         need_patch);
 
 IntReprFuncStatus TreeToIntRepr (IntRepr *interm_repr, const Tree *lang_tree);
 

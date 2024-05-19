@@ -15,6 +15,8 @@
 
 #define DEF_IR_CMD_FUNC          DEF_IR_CMD
 
+#define DEF_IR_CMD_JMP           DEF_IR_CMD
+
 #define DEF_IR_CMD(ir_cmd, ...)  RETURN_ENUM_NAME (ir_cmd);
 
 static FILE *IR_LOG_FILE = IntReprLogFileCreate ("IR_log.txt");

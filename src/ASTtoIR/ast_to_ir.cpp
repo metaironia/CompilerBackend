@@ -77,7 +77,8 @@ IntReprFuncStatus IntReprEmit (IntRepr *interm_repr,
                                const OperandType  src_operand_type,  const double      src_operand_value,
                                const int64_t      src_operand_disp,  const bool        is_src_operand_mem,
                                      IntReprCell *jump_ptr,          const int64_t     jump_cell_index,
-                               const int64_t     jump_addr,          const bool        need_patch) {
+                               const int64_t      jump_addr,         const bool        is_jumpable_here,
+                               const bool         need_patch) {
 
     assert (interm_repr);
 
@@ -97,10 +98,11 @@ IntReprFuncStatus IntReprEmit (IntRepr *interm_repr,
     (IR_TOP_CELL_ -> src_operand).operand_disp   = src_operand_disp;
     (IR_TOP_CELL_ -> src_operand).is_operand_mem = is_src_operand_mem;
 
-    IR_TOP_CELL_ -> jump_ptr        = jump_ptr;
-    IR_TOP_CELL_ -> jump_cell_index = jump_cell_index; 
-    IR_TOP_CELL_ -> jump_addr       = jump_addr;
-    IR_TOP_CELL_ -> need_patch      = need_patch;
+    IR_TOP_CELL_ -> jump_ptr         = jump_ptr;
+    IR_TOP_CELL_ -> jump_cell_index  = jump_cell_index; 
+    IR_TOP_CELL_ -> jump_addr        = jump_addr;
+    IR_TOP_CELL_ -> is_jumpable_here = is_jumpable_here; 
+    IR_TOP_CELL_ -> need_patch       = need_patch;
 
     IR_SIZE_++;
 
@@ -429,8 +431,9 @@ IntReprFuncStatus IntReprOperatorIfWrite (IntRepr *interm_repr, const TreeNode *
 
     IntReprLangOperatorWrite (interm_repr, current_node, mem_disp);
 
-    IR_PATCH_CMD_JUMP (before_if_interm_repr_size, IR_SIZE_);
-
+    IR_PATCH_CMD_JUMP          (before_if_interm_repr_size, IR_SIZE_);
+    IR_ACTIVATE_JUMPABLE_STATE (IR_SIZE_);
+    
     IR_EMIT_COMMENT ("\n");
 
     return IR_FUNC_STATUS_OK;
@@ -454,6 +457,8 @@ IntReprFuncStatus IntReprOperatorWhileWrite (IntRepr *interm_repr, const TreeNod
 
     IR_EMIT_COMMENT ("\n");
 
+    IR_ACTIVATE_JUMPABLE_STATE (IR_SIZE_);
+
     IntReprLangOperatorWrite (interm_repr, current_node -> right_branch, mem_disp);
 
     const size_t after_body_while_interm_repr_size = IR_SIZE_;
@@ -462,6 +467,8 @@ IntReprFuncStatus IntReprOperatorWhileWrite (IntRepr *interm_repr, const TreeNod
 
     IR_PATCH_CMD_JUMP (after_body_while_interm_repr_size, before_while_interm_repr_size);
     IR_PATCH_CMD_JUMP (after_cond_while_interm_repr_size, IR_SIZE_);
+
+    IR_ACTIVATE_JUMPABLE_STATE (IR_SIZE_);
 
     IR_EMIT_COMMENT ("\n");
 
