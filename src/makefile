@@ -29,6 +29,7 @@ $(EXECUTABLE): $(OBJECTS)
 clean:
 	 rm -f *.o compiler_backend.exe
 	 rm -f ASTtoIR/*.o
+	 rm -f IRtoASM/*.o
 	 rm -f ../lib/tree/*.o
 	 rm -f ../lib/tree/math_tree/*.o
 	 rm -f ../lib/oneginlib/*.o
