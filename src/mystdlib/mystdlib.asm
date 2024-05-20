@@ -3,9 +3,11 @@
 extern GetStdHandle  ; kernel32.dll
 extern WriteConsoleA ; kernel32.dll
 extern ReadConsoleA  ; kernel32.dll
+extern ExitProcess   ; kernel32.dll
 
 global _MyPrint
 global _MyRead
+global _MyExit
 
 section .text
 
@@ -274,8 +276,13 @@ _CharRead:      mov rcx, rdi                     ; rcx = stdin
                 
                 ret
                 
+;------------------------------------------------
+; _MyExit (exits process)
+; Return: -
+;------------------------------------------------
 
-; _MyExit:
+_MyExit:        mov rcx, 0
+                call ExitProcess
 
 section .data
 
