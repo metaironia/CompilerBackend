@@ -177,9 +177,10 @@ IntReprFuncStatus IntReprFuncEpilogueWrite (IntRepr *interm_repr) {
     return IR_FUNC_STATUS_OK;
 }
 
-IntReprFuncStatus IntReprInitFuncArgsWrite (IntRepr *interm_repr, const TreeNode *current_node) {
+IntReprFuncStatus IntReprInitFuncArgsWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp) {
 
     assert (interm_repr);
+    assert (mem_disp);
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
 
@@ -213,12 +214,14 @@ IntReprFuncStatus IntReprInitFuncArgsWrite (IntRepr *interm_repr, const TreeNode
 
         arg_num++;
 
+        *mem_disp -= STACK_CELL_SIZE;
+
         current_node = current_arg_node;
 
         switch (NODE_LANG_OPERATOR) {
 
             case COMMA:
-                return IntReprInitFuncArgsWrite (interm_repr, current_node -> left_branch);
+                return IntReprInitFuncArgsWrite (interm_repr, current_node -> left_branch, mem_disp);
                 break;
 
             case INIT:
@@ -262,7 +265,7 @@ IntReprFuncStatus IntReprNewFuncWrite (IntRepr *interm_repr, const TreeNode *cur
         IntReprFuncPrologueWrite (interm_repr);
 
         IR_EMIT_COMMENT          ("; start of init of func args\n");
-        IntReprInitFuncArgsWrite (interm_repr, CURRENT_FUNC_NAME_NODE (func_node) -> left_branch); //TODO init func
+        IntReprInitFuncArgsWrite (interm_repr, CURRENT_FUNC_NAME_NODE (func_node) -> left_branch, &mem_disp);
         IR_EMIT_COMMENT          ("; end of init of func args\n\n");
 
         IntReprLangOperatorWrite (interm_repr, CURRENT_FUNC_FIRST_END_LINE_NODE (func_node), &mem_disp);
@@ -431,15 +434,42 @@ IntReprFuncStatus IntReprOperatorIfWrite (IntRepr *interm_repr, const TreeNode *
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
 
+    const TreeNode *current_if_node = current_node; 
+    const int       old_mem_disp    = *mem_disp;
+
     IR_EMIT_COMMENT ("; if operator\n");
 
     IntReprOperatorOrAndWrite (interm_repr, current_node -> left_branch, mem_disp);
 
+    *mem_disp = old_mem_disp;
+
     const size_t before_if_interm_repr_size = IR_SIZE_;
 
-    IR_EMIT_CMD_JUMP_NOT_EQUAL_;
+    current_node = current_if_node -> left_branch;
+/*
+    switch (NODE_MATH_OPERATOR) {
 
-    current_node = current_node -> right_branch;
+        case OPERATOR_GREATER:
+            IR_EMIT_CMD_JUMP_LESS_EQ_;
+            break;
+
+        case OPERATOR_LESS:
+            IR_EMIT_CMD_JUMP_GREATER_EQ_;
+            break;
+
+        case OPERATOR_EQUAL:
+            IR_EMIT_CMD_JUMP_NOT_EQUAL_;
+            break;
+
+        case OPERATOR_NOT_EQUAL:
+            IR_EMIT_CMD_JUMP_EQUAL_;
+            break;
+        
+        default:
+            IR_EMIT_COMMENT ("\nCAN NOT CONVERT IF OPERATOR\n");
+    }
+*/
+    current_node = current_if_node -> right_branch;
 
     IR_EMIT_COMMENT ("\n");
 
@@ -449,6 +479,8 @@ IntReprFuncStatus IntReprOperatorIfWrite (IntRepr *interm_repr, const TreeNode *
     IR_ACTIVATE_JUMPABLE_STATE (IR_SIZE_);
     
     IR_EMIT_COMMENT ("\n");
+
+    *mem_disp = old_mem_disp;
 
     return IR_FUNC_STATUS_OK;
 }
@@ -605,10 +637,16 @@ IntReprFuncStatus IntReprOperatorAssignWrite (IntRepr *interm_repr, const TreeNo
 
     current_node = current_node -> left_branch;
 
-    const int64_t var_mem_disp = - ((int64_t) NODE_VALUE * STACK_CELL_SIZE + STACK_CELL_SIZE);
+    const int var_mem_disp = - ((int) NODE_VALUE * STACK_CELL_SIZE + STACK_CELL_SIZE);
 
     IR_EMIT_CMD_MOVE_DOUBLE_RM (IR_OP_REG_XMM4, IR_OP_REG_RBP, *mem_disp);
     IR_EMIT_CMD_MOVE_DOUBLE_MR (IR_OP_REG_RBP,  var_mem_disp,  IR_OP_REG_XMM4);
+
+    if (var_mem_disp <= *mem_disp)
+        *mem_disp = var_mem_disp;
+
+    else
+        *mem_disp += STACK_CELL_SIZE;
 
     IR_EMIT_COMMENT ("\n");
 
@@ -637,6 +675,7 @@ IntReprFuncStatus IntReprMathExpressionWrite (IntRepr *interm_repr, const TreeNo
                 
                 case FUNC_CALL:
                     IntReprFuncCallWrite       (interm_repr,   current_node -> left_branch, mem_disp);
+                    *mem_disp -= STACK_CELL_SIZE;
                     IR_EMIT_CMD_MOVE_DOUBLE_MR (IR_OP_REG_RBP, *mem_disp,                   IR_OP_REG_XMM4);
                     return IR_FUNC_STATUS_OK;
                 
@@ -687,6 +726,8 @@ IntReprFuncStatus IntReprFuncCallWrite (IntRepr *interm_repr, const TreeNode *cu
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
 
+    int old_mem_disp = *mem_disp;
+
     if (current_node -> left_branch) {
 
         IR_EMIT_COMMENT            ("; start of writing passed args\n");
@@ -701,6 +742,8 @@ IntReprFuncStatus IntReprFuncCallWrite (IntRepr *interm_repr, const TreeNode *cu
     IR_EMIT_CMD_MOVE_RR   (IR_OP_REG_RSP, IR_OP_REG_RBP);
 
     IR_EMIT_COMMENT ("\n");
+
+    *mem_disp = old_mem_disp;
 
     return IR_FUNC_STATUS_OK;
 }

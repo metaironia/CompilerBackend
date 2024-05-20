@@ -113,7 +113,7 @@ IntReprFuncStatus TreeToIntRepr (IntRepr *interm_repr, const Tree *lang_tree);
 
 IntReprFuncStatus IntReprBeginAndEnd (IntRepr *interm_repr);
 
-IntReprFuncStatus IntReprInitFuncArgsWrite (IntRepr *interm_repr, const TreeNode *current_node);
+IntReprFuncStatus IntReprInitFuncArgsWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp);
 
 IntReprFuncStatus IntReprFuncNameWrite (IntRepr *interm_repr, const TreeNode *current_func_node);
 
