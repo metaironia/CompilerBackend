@@ -1,14 +1,5 @@
 ; 64-bit standart lib for Windows 
 
-extern GetStdHandle  ; kernel32.dll
-extern WriteConsoleA ; kernel32.dll
-extern ReadConsoleA  ; kernel32.dll
-extern ExitProcess   ; kernel32.dll
-
-global _MyPrint
-global _MyRead
-global _MyExit
-
 section .text
 
 PRINT_BUFFER_CAPACITY equ 4d
