@@ -6,6 +6,7 @@ PRINT_BUFFER_CAPACITY equ 4d
 INT_BUFFER_CAPACITY   equ 20d
 PRINT_PRECISION       equ 1000d
 ENTER_SYMBOL          equ 0Dh
+LINE_FEED             equ 0Ah
 
 ;------------------------------------------------
 ; _MyPrint (prints double number to 3 decimal places)
@@ -45,9 +46,12 @@ _MyPrint:       movsd xmm6, xmm4                 ; xmm6 is non-volatile register
     
                 call _PrintDec                   ; prints 3 decimal digits
     
+                mov al, LINE_FEED
+                call _BufferCharAdd              ; add new line char to buffer
+
                 test r10, r10                    ; if buffer size is 0
                 je _EndPrint
-    
+
                 call _CmdFlush                   ; calling cmd flush if the buffer is not empty   
   
 _EndPrint:      ret
@@ -245,8 +249,9 @@ _DecPartRead:   call _CharRead
 
                 jmp _DecPartRead
 
-_MyReadEnd:     mulsd xmm6, xmm10
-                movsd xmm4, xmm6                   ; xmm4 = read number
+_MyReadEnd:     call _CharRead                   ; to skip 0Ah (new line char)
+                mulsd xmm6, xmm10
+                movsd xmm4, xmm6                 ; xmm4 = read number
                 
                 ret
            
