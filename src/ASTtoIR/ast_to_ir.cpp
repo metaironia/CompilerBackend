@@ -335,8 +335,8 @@ IntReprFuncStatus IntReprLangOperatorWrite (IntRepr *interm_repr, const TreeNode
                 break;
 
             case READ:
-                IntReprOperatorReadWrite   (interm_repr,   current_node);
-                IR_EMIT_CMD_MOVE_DOUBLE_MR (IR_OP_REG_RBP, *mem_disp, IR_OP_REG_XMM4);
+                IntReprOperatorReadWrite   (interm_repr,   current_node, mem_disp);
+                IR_EMIT_CMD_MOVE_DOUBLE_MR (IR_OP_REG_RBP, *mem_disp,    IR_OP_REG_XMM4);
                 break;
 
             default:
@@ -346,15 +346,22 @@ IntReprFuncStatus IntReprLangOperatorWrite (IntRepr *interm_repr, const TreeNode
     return IntReprLangOperatorWrite (interm_repr, end_line_node -> right_branch, mem_disp);
 }
 
-IntReprFuncStatus IntReprOperatorReadWrite (IntRepr *interm_repr, const TreeNode *current_node) {
+IntReprFuncStatus IntReprOperatorReadWrite (IntRepr *interm_repr, const TreeNode *current_node, int *mem_disp) {
 
     assert (interm_repr);
+    assert (mem_disp);
 
     MATH_TREE_NODE_VERIFY (current_node, IR);
 
     if (NODE_TYPE == LANGUAGE_OPERATOR && NODE_LANG_OPERATOR == READ) {
 
-        IR_EMIT_CMD_READ_DOUBLE_; // read value located in IR_OP_REG_XMM4
+        IR_EMIT_COMMENT ("\n");
+
+        IR_EMIT_CMD_ADD_RI  (IR_OP_REG_RSP, *mem_disp - STACK_CELL_SIZE);
+        IR_EMIT_CMD_READ_DOUBLE_;                                         // read value located in IR_OP_REG_XMM4
+        IR_EMIT_CMD_MOVE_RR (IR_OP_REG_RSP, IR_OP_REG_RBP);
+
+        IR_EMIT_COMMENT ("\n");
 
         return IR_FUNC_STATUS_OK;
     }
@@ -375,8 +382,14 @@ IntReprFuncStatus IntReprOperatorPrintWrite (IntRepr *interm_repr, const TreeNod
 
         IntReprMathExpressionWrite (interm_repr, current_node -> left_branch, mem_disp);
 
+        IR_EMIT_CMD_ADD_RI         (IR_OP_REG_RSP, *mem_disp - STACK_CELL_SIZE);
+
+        IR_EMIT_COMMENT ("\n");
+
         IR_EMIT_CMD_MOVE_DOUBLE_RM (IR_OP_REG_XMM4, IR_OP_REG_RBP, *mem_disp);
         IR_EMIT_CMD_PRINT_DOUBLE_; // value to print located in IR_OP_REG_XMM4
+
+        IR_EMIT_CMD_MOVE_RR        (IR_OP_REG_RSP, IR_OP_REG_RBP);
 
         IR_EMIT_COMMENT ("\n");
 
@@ -599,8 +612,6 @@ IntReprFuncStatus IntReprOperatorAssignWrite (IntRepr *interm_repr, const TreeNo
 
     IR_EMIT_COMMENT ("\n");
 
-    *mem_disp += STACK_CELL_SIZE;
-
     return IR_FUNC_STATUS_OK;
 }
 
@@ -631,8 +642,8 @@ IntReprFuncStatus IntReprMathExpressionWrite (IntRepr *interm_repr, const TreeNo
                 
                 case READ:
                     *mem_disp -= STACK_CELL_SIZE;
-                    IntReprOperatorReadWrite   (interm_repr,   current_node);  // read value in IR_OP_REG_XMM4
-                    IR_EMIT_CMD_MOVE_DOUBLE_MR (IR_OP_REG_RBP, *mem_disp, IR_OP_REG_XMM4);
+                    IntReprOperatorReadWrite   (interm_repr,   current_node, mem_disp);  // read value in IR_OP_REG_XMM4
+                    IR_EMIT_CMD_MOVE_DOUBLE_MR (IR_OP_REG_RBP, *mem_disp,    IR_OP_REG_XMM4);
                     return IR_FUNC_STATUS_OK;
 
                 default:
