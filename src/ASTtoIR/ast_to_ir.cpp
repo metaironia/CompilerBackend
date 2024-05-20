@@ -170,7 +170,7 @@ IntReprFuncStatus IntReprFuncEpilogueWrite (IntRepr *interm_repr) {
 
     IR_EMIT_COMMENT ("\n; restoring rbp\n");
     
-    IR_EMIT_CMD_MOVE_RM (IR_OP_REG_RBP, IR_OP_REG_RBP, 0);
+    IR_EMIT_CMD_POP (IR_OP_REG_RBP);
 
     IR_EMIT_COMMENT ("\n");
 
@@ -208,8 +208,8 @@ IntReprFuncStatus IntReprInitFuncArgsWrite (IntRepr *interm_repr, const TreeNode
                 return IR_FUNC_STATUS_FAIL;
         }
 
-        IR_EMIT_CMD_MOVE_DOUBLE_RM (IR_OP_REG_XMM4, IR_OP_REG_RBP, (arg_num + 2) * STACK_CELL_SIZE);
-        IR_EMIT_CMD_MOVE_DOUBLE_MR (IR_OP_REG_RBP, (size_t) NODE_VALUE, IR_OP_REG_XMM4);
+        IR_EMIT_CMD_MOVE_DOUBLE_RM (IR_OP_REG_XMM4, IR_OP_REG_RBP, (arg_num + 3) * STACK_CELL_SIZE);
+        IR_EMIT_CMD_MOVE_DOUBLE_MR (IR_OP_REG_RBP, -((int64_t) NODE_VALUE + 1) * STACK_CELL_SIZE, IR_OP_REG_XMM4);
 
         arg_num++;
 
@@ -424,7 +424,7 @@ IntReprFuncStatus IntReprOperatorIfWrite (IntRepr *interm_repr, const TreeNode *
 
     const size_t before_if_interm_repr_size = IR_SIZE_;
 
-    IR_EMIT_CMD_JUMP_EQUAL_;
+    IR_EMIT_CMD_JUMP_NOT_EQUAL_;
 
     current_node = current_node -> right_branch;
 
@@ -728,16 +728,15 @@ IntReprFuncStatus IntReprVarOrNumWrite (IntRepr *interm_repr, const TreeNode *cu
     *mem_disp -= STACK_CELL_SIZE;
 
     if (NODE_TYPE == NUMBER)
-        IR_EMIT_CMD_MOVE_DOUBLE_MI (IR_OP_REG_RBP, *mem_disp, NODE_VALUE);
+        IR_EMIT_CMD_MOVE_DOUBLE_RI (IR_OP_REG_XMM4, NODE_VALUE);
 
-    else if (NODE_TYPE == VARIABLE) {
-
-        IR_EMIT_CMD_MOVE_DOUBLE_RM (IR_OP_REG_XMM4, IR_OP_REG_RBP, ((int64_t) NODE_VALUE) * STACK_CELL_SIZE - STACK_CELL_SIZE);
-        IR_EMIT_CMD_MOVE_DOUBLE_MR (IR_OP_REG_RBP,  *mem_disp,     IR_OP_REG_XMM4);
-    }
+    else if (NODE_TYPE == VARIABLE)
+        IR_EMIT_CMD_MOVE_DOUBLE_RM (IR_OP_REG_XMM4, IR_OP_REG_RBP, -((int64_t) NODE_VALUE + 1) * STACK_CELL_SIZE);
 
     else
         return IR_FUNC_STATUS_FAIL;
+
+    IR_EMIT_CMD_MOVE_DOUBLE_MR (IR_OP_REG_RBP, *mem_disp, IR_OP_REG_XMM4);
 
     return IR_FUNC_STATUS_OK;
 }
