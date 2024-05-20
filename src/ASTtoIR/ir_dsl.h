@@ -62,6 +62,10 @@
 
 #define IR_EMIT_CMD_JUMP_GREATER_EQ_                                  IntReprEmit (interm_repr, "jump greater eq", IR_CMD_JMP_GREATER_EQ, IR_OP_NO_OPERAND, NOT_A_VALUE, NAN, IR_POISON,     false, IR_OP_NO_OPERAND, NOT_A_VALUE,       NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, true)
 
+#define IR_EMIT_CMD_JUMP_GREATER_                                     IntReprEmit (interm_repr, "jump greater",    IR_CMD_JMP_GREATER,    IR_OP_NO_OPERAND, NOT_A_VALUE, NAN, IR_POISON,     false, IR_OP_NO_OPERAND, NOT_A_VALUE,       NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, true)
+
+#define IR_EMIT_CMD_JUMP_LESS_                                        IntReprEmit (interm_repr, "jump less",       IR_CMD_JMP_LESS,       IR_OP_NO_OPERAND, NOT_A_VALUE, NAN, IR_POISON,     false, IR_OP_NO_OPERAND, NOT_A_VALUE,       NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, true)
+
 #define IR_EMIT_CMD_JUMP_                                             IntReprEmit (interm_repr, "jump",            IR_CMD_JMP,            IR_OP_NO_OPERAND, NOT_A_VALUE, NAN, IR_POISON,     false, IR_OP_NO_OPERAND, NOT_A_VALUE,       NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, true)
     
 #define IR_EMIT_COMMENT(comment)                                      IntReprEmit (interm_repr, comment,           IR_CMD_COMMENT,        IR_OP_NO_OPERAND, NOT_A_VALUE, NAN, IR_POISON,     false, IR_OP_NO_OPERAND, NOT_A_VALUE,       NAN,     IR_POISON,    false, NULL, IR_POISON, IR_POISON, false)

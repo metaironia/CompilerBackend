@@ -440,11 +440,11 @@ IntReprFuncStatus IntReprOperatorIfWrite (IntRepr *interm_repr, const TreeNode *
     switch (NODE_MATH_OPERATOR) {
 
         case OPERATOR_GREATER:
-            IR_EMIT_CMD_JUMP_LESS_EQ_;
+            IR_EMIT_CMD_JUMP_GREATER_EQ_;
             break;
 
         case OPERATOR_LESS:
-            IR_EMIT_CMD_JUMP_GREATER_EQ_;
+            IR_EMIT_CMD_JUMP_LESS_EQ_;
             break;
 
         case OPERATOR_EQUAL:
