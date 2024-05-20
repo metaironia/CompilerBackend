@@ -35,14 +35,13 @@
 
 #define DEF_IR_CMD_FUNC(...)
 
-
 const char *AsmFileNameGen (const char *output_file_name) {
 
     assert (output_file_name);
 
     static char output_asm_file_name[MAX_ASM_FILE_LENGTH] = {};
 
-    snprintf (output_asm_file_name, MAX_ASM_FILE_LENGTH, "asm_%s", output_file_name);
+    snprintf (output_asm_file_name, MAX_ASM_FILE_LENGTH, "%s.asm", output_file_name);
 
     return output_asm_file_name;
 }
@@ -54,7 +53,24 @@ IntReprFuncStatus IntReprToAsmFile (const IntRepr *interm_repr, const char *outp
 
     FILE *asm_file = fopen (AsmFileNameGen (output_file_name), "w");
 
-    fprintf (asm_file, "section .text\n");
+    IntReprAsmHeaderPrint (asm_file);
+
+    IntReprAllCmdsToAsmPrint (asm_file, interm_repr);
+
+    fprintf (asm_file, "\nsection .data\n\n");
+    
+    IntReprDoubleValDefPrint (asm_file, interm_repr);
+
+    fclose (asm_file);
+    asm_file = NULL;
+
+    return IR_FUNC_STATUS_OK;
+}
+
+IntReprFuncStatus IntReprAllCmdsToAsmPrint (FILE *asm_file, const IntRepr *interm_repr) {
+
+    assert (asm_file);
+    assert (interm_repr);
 
     for (size_t i = 0; i < (size_t) IR_SIZE_; i++) {
 
@@ -67,8 +83,45 @@ IntReprFuncStatus IntReprToAsmFile (const IntRepr *interm_repr, const char *outp
         IntReprCmdToAsmPrint (asm_file, IR_CELL_ + i);
     }
 
-    fclose (asm_file);
-    asm_file = NULL;
+    return IR_FUNC_STATUS_OK;
+}
+
+IntReprFuncStatus IntReprDoubleValDefPrint (FILE *asm_file, const IntRepr *interm_repr) {
+
+    assert (asm_file);
+    assert (interm_repr);
+        
+    int label_num = 0;
+
+    for (size_t i = 0; i < (size_t) IR_SIZE_; i++) {
+
+        if (((IR_CELL_ + i) -> src_operand).operand_type       == IR_OP_IMMEDIATE &&
+            ((IR_CELL_ + i) -> src_operand).operand_value_type == VALUE_TYPE_DOUBLE) {
+
+            IntReprImmValAsmLabelPrint (asm_file, ((IR_CELL_ + i) -> src_operand).operand_value);
+
+            fprintf (asm_file, "_%d: ", label_num++);
+
+            fprintf (asm_file, "dq %.3lf\n", ((IR_CELL_ + i) -> src_operand).operand_value);
+        }
+    }
+
+    return IR_FUNC_STATUS_OK;
+}
+
+IntReprFuncStatus IntReprAsmHeaderPrint (FILE *asm_file) {
+
+    assert (asm_file);
+
+    fprintf (asm_file, "extern GetStdHandle  ; kernel32.dll\n"
+                       "extern WriteConsoleA ; kernel32.dll\n"
+                       "extern ReadConsoleA  ; kernel32.dll\n"
+                       "extern ExitProcess   ; kernel32.dll\n"
+                       "\n"
+                       "%%include \"mystdlib/mystdlib.asm\"\n"
+                       "\n"
+                       "section .text\n\n"
+                       "_start:\n");
 
     return IR_FUNC_STATUS_OK;
 }
@@ -199,10 +252,13 @@ IntReprFuncStatus IntReprImmValToAsmPrint (FILE *asm_file, const IntReprOperand 
             fprintf (asm_file, "%" PRId64, (int64_t) (interm_repr_operand -> operand_value));
             break;
 
-        case VALUE_TYPE_DOUBLE:
+        case VALUE_TYPE_DOUBLE: {
+            static int label_num = 0;
             IntReprImmValAsmLabelPrint (asm_file, interm_repr_operand -> operand_value);
+            fprintf (asm_file, "_%d", label_num++);
             break;
-        
+        }
+
         case NOT_A_VALUE:
             fprintf (stderr, "ATTEMPT TO PRINT NOT A VALUE TO ASM\n");
             return IR_FUNC_STATUS_FAIL;
@@ -216,6 +272,8 @@ IntReprFuncStatus IntReprImmValToAsmPrint (FILE *asm_file, const IntReprOperand 
 }
 
 IntReprFuncStatus IntReprImmValAsmLabelPrint (FILE *asm_file, const double number) {
+
+    assert (asm_file);
 
     fprintf (asm_file, "_DOUBLE_");
 

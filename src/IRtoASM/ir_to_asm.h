@@ -11,6 +11,12 @@ const char *AsmFileNameGen (const char *output_file_name);
 
 IntReprFuncStatus IntReprToAsmFile (const IntRepr *interm_repr, const char *output_file_name);
 
+IntReprFuncStatus IntReprAsmHeaderPrint (FILE *asm_file);
+
+IntReprFuncStatus IntReprAllCmdsToAsmPrint (FILE *asm_file, const IntRepr *interm_repr);
+
+IntReprFuncStatus IntReprDoubleValDefPrint (FILE *asm_file, const IntRepr *interm_repr);
+
 IntReprFuncStatus IntReprCmdToAsmPrint (FILE *asm_file, const IntReprCell *interm_repr_cell);
 
 IntReprFuncStatus IntReprOperandToAsmPrint (FILE *asm_file, const IntReprOperand *interm_repr_operand);
