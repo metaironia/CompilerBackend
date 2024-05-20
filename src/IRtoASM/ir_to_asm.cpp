@@ -61,6 +61,8 @@ IntReprFuncStatus IntReprToAsmFile (const IntRepr *interm_repr, const char *outp
     
     IntReprDoubleValDefPrint (asm_file, interm_repr);
 
+    fprintf (asm_file, "\n%%include \"mystdlib/mystdlib.asm\"\n");
+
     fclose (asm_file);
     asm_file = NULL;
 
@@ -117,8 +119,6 @@ IntReprFuncStatus IntReprAsmHeaderPrint (FILE *asm_file) {
                        "extern WriteConsoleA ; kernel32.dll\n"
                        "extern ReadConsoleA  ; kernel32.dll\n"
                        "extern ExitProcess   ; kernel32.dll\n"
-                       "\n"
-                       "%%include \"mystdlib/mystdlib.asm\"\n"
                        "\n"
                        "section .text\n\n"
                        "_start:\n");
@@ -254,8 +254,9 @@ IntReprFuncStatus IntReprImmValToAsmPrint (FILE *asm_file, const IntReprOperand 
 
         case VALUE_TYPE_DOUBLE: {
             static int label_num = 0;
+            fprintf (asm_file, "[rel ");
             IntReprImmValAsmLabelPrint (asm_file, interm_repr_operand -> operand_value);
-            fprintf (asm_file, "_%d", label_num++);
+            fprintf (asm_file, "_%d]", label_num++);
             break;
         }
 
@@ -275,12 +276,18 @@ IntReprFuncStatus IntReprImmValAsmLabelPrint (FILE *asm_file, const double numbe
 
     assert (asm_file);
 
-    fprintf (asm_file, "_DOUBLE_");
+    fprintf (asm_file, "_DOUBLE__");
 
     if (number < 0)
         fprintf (asm_file, "neg_");
 
-    fprintf (asm_file, "%lf[rip]", fabs (number));
+    const double abs_value = fabs (number);
+
+    double int_part = 0;
+
+    const double frac_part = modf (abs_value, &int_part);
+
+    fprintf (asm_file, "%.0lf_%.0lf", int_part, frac_part);
 
     return IR_FUNC_STATUS_OK;
 }
