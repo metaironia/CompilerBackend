@@ -10,6 +10,7 @@ WARNINGS=-Wshadow -Winit-self -Wcast-align -Wundef -Wfloat-equal -Winline -Wredu
 SOURCES= main.cpp backend_input.cpp \
 	 ASTtoIR/ast_to_ir.cpp ASTtoIR/ir_log.cpp \
 	 IRtoASM/ir_to_asm.cpp \
+ 	 IRtox86/ir_to_x86.cpp \
 	 ../lib/tree/tree_func.cpp ../lib/tree/tree_log.cpp \
 	 ../lib/tree/math_tree/math_tree_func.cpp ../lib/tree/math_tree/math_operation.cpp \
        	 ../lib/oneginlib/functions_for_input.cpp \
@@ -30,6 +31,7 @@ clean:
 	 rm -f *.o compiler_backend.exe
 	 rm -f ASTtoIR/*.o
 	 rm -f IRtoASM/*.o
+	 rm -f IRtox86/*.o
 	 rm -f ../lib/tree/*.o
 	 rm -f ../lib/tree/math_tree/*.o
 	 rm -f ../lib/oneginlib/*.o
